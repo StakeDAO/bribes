@@ -2705,5 +2705,221 @@
             }
         },
         "root": "0x81212df8f3be8d7432e4cc3ced0593a305dd9eaa14479e7a880b77596801a641"
+    },
+    {
+        "symbol": "SDT",
+        "address": "0x73968b9a57c6E53d41345FD57a6E6ae27d6CDB2F",
+        "image": "https://assets.coingecko.com/coins/images/13724/small/stakedao_logo.jpg?1611195011",
+        "merkle": {
+            "0x0397d4a6f9078884a1815f9dbe1e3fdccfdc4c50": {
+                "index": 0,
+                "amount": {
+                    "type": "BigNumber",
+                    "hex": "0x2901455ba2117fd7c0"
+                },
+                "proof": [
+                    "0xba039de4773ce21ed3ea8b21fba594d94bdd9fd3c778257bdecb1efd8a4b06e7",
+                    "0x1cc9a8d0db9c431fe817e58d9a15446af59233246ba67bcb93fda8b27f93ead5",
+                    "0xe42a730accb1a04d53eaa7ba289cfa804e60302e99ef032e054643f9ea3727e1",
+                    "0xbd338e869f8a2ac5871073f90f00cc03b13afc10ea48dc1e73899276a874d3e6"
+                ]
+            },
+            "0x1a162a5fdaebb0113f7b83ed87a43bcf0b6a4d1e": {
+                "index": 1,
+                "amount": {
+                    "type": "BigNumber",
+                    "hex": "0x302ae0c02f58982640"
+                },
+                "proof": [
+                    "0x62eb11506b0e7122a7b3385bfb470b624109b9e9aead4d70ab315d467fa66256",
+                    "0x1bda67ea81ee6fae1e08d99e524aeb3a000569c847ad687bab19296805af1e58",
+                    "0x73e264a1f5f9fd76284c339f814729d0d34807b98ff6283c5221a3902d292739",
+                    "0x2b22a6512b9acfaca098f854f6e7db62e4e4b9402d8505072f0183f178e685e3"
+                ]
+            },
+            "0x210a3428d10bf9a68f339006141803f3513e976a": {
+                "index": 2,
+                "amount": {
+                    "type": "BigNumber",
+                    "hex": "0x3a470ed58068b44080"
+                },
+                "proof": [
+                    "0x397791f1d41f49cf7cdbf545d746a693af7b0011f0c0a65531b4ed50275c47fb",
+                    "0x72d59bdc64b71d2d243982d19a388702420e0876dc5658dc930a3896ce9df962",
+                    "0xe44174cb9178194f52379c62cde39a2415d7f8c4b308c0a755ef4d37d9dc3d74",
+                    "0x2b22a6512b9acfaca098f854f6e7db62e4e4b9402d8505072f0183f178e685e3"
+                ]
+            },
+            "0x2f707265e61300e8290c18e38ebcbd129fb0b0f5": {
+                "index": 3,
+                "amount": {
+                    "type": "BigNumber",
+                    "hex": "0x3eae2bcd84b5d17700"
+                },
+                "proof": [
+                    "0xf0a6af6ed3692951292efff22509a088f0046f61617f0013a841183db9d9ebb1",
+                    "0xfc56b1d777203d986b8c1fe98e5f48440206164cb1b040117fc5d299154db60b",
+                    "0x03f4d2f406e82e2c09d53fd0f18375be176657a432c55dfbe57d2d1140984a8c",
+                    "0xbd338e869f8a2ac5871073f90f00cc03b13afc10ea48dc1e73899276a874d3e6"
+                ]
+            },
+            "0x327ae09aeffc9a276529b61870e896e733933801": {
+                "index": 4,
+                "amount": {
+                    "type": "BigNumber",
+                    "hex": "0x0dfebad54054d64300"
+                },
+                "proof": [
+                    "0x5bf5707d13ff00642accb4f34ce26dd174c04e47dd06e03ea653d4a7bca1c76c",
+                    "0x241ccc7683e8c1e47d10efe5b84467b2485eb6a7a53c25a888f2da789a99ecdf",
+                    "0xe44174cb9178194f52379c62cde39a2415d7f8c4b308c0a755ef4d37d9dc3d74",
+                    "0x2b22a6512b9acfaca098f854f6e7db62e4e4b9402d8505072f0183f178e685e3"
+                ]
+            },
+            "0x3ac892a09165516d98ec9c02b95ff840ab4badae": {
+                "index": 5,
+                "amount": {
+                    "type": "BigNumber",
+                    "hex": "0x1061fc30480eeb4840"
+                },
+                "proof": [
+                    "0x9b474e469cba2e3a7e60a0be458b63d30058933cc85878d07dd2543c3bbc74b6",
+                    "0x1b6dff1b60794577d6716e485043300871fe6e1298545f51721282930644a987",
+                    "0xe42a730accb1a04d53eaa7ba289cfa804e60302e99ef032e054643f9ea3727e1",
+                    "0xbd338e869f8a2ac5871073f90f00cc03b13afc10ea48dc1e73899276a874d3e6"
+                ]
+            },
+            "0x48fb55ed1fb62ed26274fb805f6444bea97c1f28": {
+                "index": 6,
+                "amount": {
+                    "type": "BigNumber",
+                    "hex": "0x1c75562e8ee78ad7c0"
+                },
+                "proof": [
+                    "0x977dad7b48d338f49ef5f7ff96e1d7257ba0d8cc75b4d46c039fe8fe530cb3a8",
+                    "0x3b548d437885e15822fc8ab5602b36dbf37701d377c539930c80bc8ae1454e93",
+                    "0x73e264a1f5f9fd76284c339f814729d0d34807b98ff6283c5221a3902d292739",
+                    "0x2b22a6512b9acfaca098f854f6e7db62e4e4b9402d8505072f0183f178e685e3"
+                ]
+            },
+            "0x946fb1b69a0f53599cb685a9a12f870f280c5bd9": {
+                "index": 7,
+                "amount": {
+                    "type": "BigNumber",
+                    "hex": "0x09e1ac7258826f3e40"
+                },
+                "proof": [
+                    "0xc8cd013bd41281925c399903512b7ba98ae29b7a5c2eebfe866a65bc253c404d",
+                    "0x1cc9a8d0db9c431fe817e58d9a15446af59233246ba67bcb93fda8b27f93ead5",
+                    "0xe42a730accb1a04d53eaa7ba289cfa804e60302e99ef032e054643f9ea3727e1",
+                    "0xbd338e869f8a2ac5871073f90f00cc03b13afc10ea48dc1e73899276a874d3e6"
+                ]
+            },
+            "0x95f1872c2c63f54072bd42f68beee71e0d6f67d3": {
+                "index": 8,
+                "amount": {
+                    "type": "BigNumber",
+                    "hex": "0xd555e1bb5fa99a1100"
+                },
+                "proof": [
+                    "0xd0ada4aa81b19b5bf7260bf5a22a4e88b9c580368ffffa92224f0ce75612b0b5",
+                    "0xfc56b1d777203d986b8c1fe98e5f48440206164cb1b040117fc5d299154db60b",
+                    "0x03f4d2f406e82e2c09d53fd0f18375be176657a432c55dfbe57d2d1140984a8c",
+                    "0xbd338e869f8a2ac5871073f90f00cc03b13afc10ea48dc1e73899276a874d3e6"
+                ]
+            },
+            "0x9a17e9f6363907cfa3da4ed7819914128f9a80c6": {
+                "index": 9,
+                "amount": {
+                    "type": "BigNumber",
+                    "hex": "0x5c27f1dd721c89a800"
+                },
+                "proof": [
+                    "0x21fd5895e14d2c7fedbe960cc92a24d1d941d4ef47ecdcdcd89ec9b82689f795",
+                    "0x72d59bdc64b71d2d243982d19a388702420e0876dc5658dc930a3896ce9df962",
+                    "0xe44174cb9178194f52379c62cde39a2415d7f8c4b308c0a755ef4d37d9dc3d74",
+                    "0x2b22a6512b9acfaca098f854f6e7db62e4e4b9402d8505072f0183f178e685e3"
+                ]
+            },
+            "0xb0e83c2d71a991017e0116d58c5765abc57384af": {
+                "index": 10,
+                "amount": {
+                    "type": "BigNumber",
+                    "hex": "0x04ece1fd267b773df600"
+                },
+                "proof": [
+                    "0xa024beb8398bf37fc86f31c6eae2aa6b7d07cc395fa9df669dcc5f44d598b12a",
+                    "0x1b6dff1b60794577d6716e485043300871fe6e1298545f51721282930644a987",
+                    "0xe42a730accb1a04d53eaa7ba289cfa804e60302e99ef032e054643f9ea3727e1",
+                    "0xbd338e869f8a2ac5871073f90f00cc03b13afc10ea48dc1e73899276a874d3e6"
+                ]
+            },
+            "0xb957dccaa1ccfb1eb78b495b499801d591d8a403": {
+                "index": 11,
+                "amount": {
+                    "type": "BigNumber",
+                    "hex": "0x04b8d31fff78668000"
+                },
+                "proof": [
+                    "0x5c42a2c256152445a1d6e1a6fd1cedbe5baca841c1e57c4ee213d68ce8251077",
+                    "0x1bda67ea81ee6fae1e08d99e524aeb3a000569c847ad687bab19296805af1e58",
+                    "0x73e264a1f5f9fd76284c339f814729d0d34807b98ff6283c5221a3902d292739",
+                    "0x2b22a6512b9acfaca098f854f6e7db62e4e4b9402d8505072f0183f178e685e3"
+                ]
+            },
+            "0xcffea940ae53725ffe834895c79ce3d2b5c0ff86": {
+                "index": 12,
+                "amount": {
+                    "type": "BigNumber",
+                    "hex": "0x07a661c74a186aebc0"
+                },
+                "proof": [
+                    "0x8d8750f2aca66040af6841091521c577f39c331f0fe6d30742d1ec4a4c7d0fa3",
+                    "0x3b548d437885e15822fc8ab5602b36dbf37701d377c539930c80bc8ae1454e93",
+                    "0x73e264a1f5f9fd76284c339f814729d0d34807b98ff6283c5221a3902d292739",
+                    "0x2b22a6512b9acfaca098f854f6e7db62e4e4b9402d8505072f0183f178e685e3"
+                ]
+            },
+            "0xd6e50cb0e646206231bbfb2c8424c1420152f005": {
+                "index": 13,
+                "amount": {
+                    "type": "BigNumber",
+                    "hex": "0x010c9c471dbe284a5700"
+                },
+                "proof": [
+                    "0x504e0e4164333d19bc754086dbed3aea8f90ac471a67eeeaf611737b61108d97",
+                    "0x241ccc7683e8c1e47d10efe5b84467b2485eb6a7a53c25a888f2da789a99ecdf",
+                    "0xe44174cb9178194f52379c62cde39a2415d7f8c4b308c0a755ef4d37d9dc3d74",
+                    "0x2b22a6512b9acfaca098f854f6e7db62e4e4b9402d8505072f0183f178e685e3"
+                ]
+            },
+            "0xd8de4c018fadb5a0cccacb3ebd6a3fe916f224f6": {
+                "index": 14,
+                "amount": {
+                    "type": "BigNumber",
+                    "hex": "0xed00f76da8753b0300"
+                },
+                "proof": [
+                    "0xf763595ca3e270aff7dfaebbe53baf822e13632762a6d15112f16d7c76238e32",
+                    "0x8c5c2285b4d9f28e9fcc0174e8194325b9799c010194f43c3d534685343bbbff",
+                    "0x03f4d2f406e82e2c09d53fd0f18375be176657a432c55dfbe57d2d1140984a8c",
+                    "0xbd338e869f8a2ac5871073f90f00cc03b13afc10ea48dc1e73899276a874d3e6"
+                ]
+            },
+            "0xec70538beac744eec5edec4b329205a4b29ba8ae": {
+                "index": 15,
+                "amount": {
+                    "type": "BigNumber",
+                    "hex": "0x032f2b8f57ee06064800"
+                },
+                "proof": [
+                    "0xff97a8b2e907605b8cdf2f112de4d48dc574505517797b6021c1398f6b1c6cc2",
+                    "0x8c5c2285b4d9f28e9fcc0174e8194325b9799c010194f43c3d534685343bbbff",
+                    "0x03f4d2f406e82e2c09d53fd0f18375be176657a432c55dfbe57d2d1140984a8c",
+                    "0xbd338e869f8a2ac5871073f90f00cc03b13afc10ea48dc1e73899276a874d3e6"
+                ]
+            }
+        },
+        "root": "0xd3bd27930c0145c34ba0082ac1c5a7faa648af846c5e22b8cfa36db5bac5fcb5"
     }
 ]
