@@ -22,6 +22,8 @@ const mainnetProvider = new ethers.providers.InfuraProvider("mainnet", INFURA_KE
 const MULTI_MERKLE_CONTRACT = "0x03e34b085c52985f6a5d27243f20c84bddc01db4";
 const MULTI_MERKLE_ABI = [{ "anonymous": false, "inputs": [{ "indexed": true, "internalType": "address", "name": "token", "type": "address" }, { "indexed": false, "internalType": "uint256", "name": "index", "type": "uint256" }, { "indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256" }, { "indexed": true, "internalType": "address", "name": "account", "type": "address" }, { "indexed": true, "internalType": "uint256", "name": "update", "type": "uint256" }], "name": "Claimed", "type": "event" }, { "anonymous": false, "inputs": [{ "indexed": true, "internalType": "address", "name": "token", "type": "address" }, { "indexed": true, "internalType": "bytes32", "name": "merkleRoot", "type": "bytes32" }, { "indexed": true, "internalType": "uint256", "name": "update", "type": "uint256" }], "name": "MerkleRootUpdated", "type": "event" }, { "anonymous": false, "inputs": [{ "indexed": true, "internalType": "address", "name": "previousOwner", "type": "address" }, { "indexed": true, "internalType": "address", "name": "newOwner", "type": "address" }], "name": "OwnershipTransferred", "type": "event" }, { "inputs": [{ "internalType": "address", "name": "token", "type": "address" }, { "internalType": "uint256", "name": "index", "type": "uint256" }, { "internalType": "address", "name": "account", "type": "address" }, { "internalType": "uint256", "name": "amount", "type": "uint256" }, { "internalType": "bytes32[]", "name": "merkleProof", "type": "bytes32[]" }], "name": "claim", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "account", "type": "address" }, { "components": [{ "internalType": "address", "name": "token", "type": "address" }, { "internalType": "uint256", "name": "index", "type": "uint256" }, { "internalType": "uint256", "name": "amount", "type": "uint256" }, { "internalType": "bytes32[]", "name": "merkleProof", "type": "bytes32[]" }], "internalType": "struct MultiMerkleStash.claimParam[]", "name": "claims", "type": "tuple[]" }], "name": "claimMulti", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "token", "type": "address" }, { "internalType": "uint256", "name": "index", "type": "uint256" }], "name": "isClaimed", "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "", "type": "address" }], "name": "merkleRoot", "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "owner", "outputs": [{ "internalType": "address", "name": "", "type": "address" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "renounceOwnership", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "newOwner", "type": "address" }], "name": "transferOwnership", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "", "type": "address" }], "name": "update", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "token", "type": "address" }, { "internalType": "bytes32", "name": "_merkleRoot", "type": "bytes32" }], "name": "updateMerkleRoot", "outputs": [], "stateMutability": "nonpayable", "type": "function" }];
 const ENDPOINT = "https://hub.snapshot.org/graphql";
+const ENDPOINT_DELEGATORS = "https://api.thegraph.com/subgraphs/name/snapshot-labs/snapshot";
+const DELEGATION_ADDRESS = "0x52ea58f4FC3CEd48fa18E909226c1f8A0EF887DC";
 
 const QUERY_VOTES = gql`
 	query Proposal(
@@ -82,6 +84,45 @@ const QUERY_PROPOSAL = gql`
 		}
 	}
 `;
+
+const DELEGATIONS_QUERY = gql`
+query Proposal(
+  $skip: Int
+  $timestamp: Int
+  ) {
+  delegations(first: 1000 skip: $skip where: { 
+    space: "sdcrv.eth" 
+    delegate:"0x52ea58f4fc3ced48fa18e909226c1f8a0ef887dc"
+    timestamp_lte: $timestamp
+  }) {
+    delegator
+    space
+    delegate
+  }
+}
+`;
+
+const getAllDelegators = async (timestamp) => {
+  let delegatorAddresses = [];
+  let run = true;
+  let skip = 0;
+
+  // Fetch all data
+  do {
+    const result = await request(ENDPOINT_DELEGATORS, DELEGATIONS_QUERY, {skip, timestamp});
+
+    if (result.delegations?.length > 0) {
+      delegatorAddresses = delegatorAddresses.concat(result.delegations.map((d) => d.delegator));
+      skip += 1000;
+    }
+    else {
+      run = false;
+    }
+
+  } while (run);
+
+  return delegatorAddresses;
+};
 
 const getAllAccountClaimedSinceLastFreeze = async () => {
   const mainnetContract = new ethers.Contract(
@@ -175,14 +216,34 @@ const getScores = async (proposal, votes, voters) => {
     },
   );
 
-  const result = data?.result?.scores?.[0];
-
   const scores = votes.map((vote) => {
-    const vp = vote.vp > 0 ? vote.vp : result?.[vote.voter];
+    let vp = 0;
+    if (vote.vp > 0) {
+      vp = vote.vp;
+    } else {
+      vp = data?.result?.scores?.[0]?.[vote.voter] || data?.result?.scores?.[1]?.[vote.voter];
+    }
     return { ...vote, vp };
   });
 
   return orderBy(scores, "vp", "desc");
+}
+
+const getDelegationScores = async (proposal, voters) => {
+  const { data } = await axios.post(
+    "https://score.snapshot.org/api/scores",
+    {
+      params: {
+        network: "1",
+        snapshot: parseInt(proposal.snapshot),
+        strategies: proposal.strategies,
+        space: proposal.space.id,
+        addresses: voters
+      },
+    },
+  );
+
+  return {...data?.result?.scores[0], ...data?.result?.scores[1]};
 }
 
 const numberToBigNumber = (n, decimals) => {
@@ -192,25 +253,31 @@ const numberToBigNumber = (n, decimals) => {
 const main = async () => {
 
   /*********** Inputs ********/
-  const idProposal = "QmetMTKHPCTgrwXxq8LBtjw93f9wHmhrGyrcuGH4hM7gKi";
+  const idProposal = "0xbdf578fb77aed0ef179a9c91460b541976d41516136e713a1910d24bc89325f5";
   const bribes = [
     {
-      gaugeName: "f-sdteth",
+      gaugeName: "f-stgusdc",
       token: "SDT",
       symbol: "SDT",
       image: "",
       address: "0x73968b9a57c6E53d41345FD57a6E6ae27d6CDB2F",
-      amount: 6000,
+      amount: 30000,
       decimals: 18,
     },
     {
-      gaugeName: "sdANGLE/ANGLE",
+      gaugeName: "tricrypto2",
       token: "SDT",
       symbol: "SDT",
       image: "",
       address: "0x73968b9a57c6E53d41345FD57a6E6ae27d6CDB2F",
-      amount: 2000,
+      amount: 8168,
       decimals: 18,
+    }
+  ];
+  const delegationVotes = [
+    {
+      gaugeName: "f-stgusdc",
+      share: 100,
     }
   ];
   /***************************/
@@ -223,6 +290,9 @@ const main = async () => {
   // Get all votes for a specific gauge vote
   const votes = await getVotes(idProposal);
 
+  fs.writeFileSync('tmp/votes.json', JSON.stringify(votes));
+
+
   // Get proposal
   const proposal = await getProposal(idProposal);
 
@@ -230,6 +300,45 @@ const main = async () => {
   const voters = votes.map((v) => v.voter);
 
   const scores = await getScores(proposal, votes, voters);
+
+  // Get all delegator addresses
+  const delegatorAddresses = await getAllDelegators(proposal.created);
+  let delegationScores = await getDelegationScores(proposal, delegatorAddresses.concat([DELEGATION_ADDRESS]));
+
+  // Share voting power of delegation address
+  if (delegationScores[DELEGATION_ADDRESS] > 0) {
+    const votingPowerToShare = delegationScores[DELEGATION_ADDRESS];
+    delete delegationScores[DELEGATION_ADDRESS];
+
+    const totalVp = Object.values(delegationScores).reduce((acc, a) => acc + a, 0.0);
+    for (const key of Object.keys(delegationScores)) {
+      const vp = delegationScores[key];
+      const share = vp * 100 / totalVp;
+      delegationScores[key] += votingPowerToShare * share / 100;
+    }
+  }
+  delete delegationScores[DELEGATION_ADDRESS];
+
+  // toLowerCase on all delegation addresses
+  const delegationScoresClone = {...delegationScores};
+  delegationScores = {};
+  for(const voter of Object.keys(delegationScoresClone)) {
+    delegationScores[voter.toLowerCase()] = delegationScoresClone[voter];
+  }
+
+  // Remove from delegation scores where users voted directly
+  // Example, i have 2000 vp and i vote in our UI with 1000 vp for a specific gauge
+  // The delegation have not 2000 vp but 1000 vp
+  for (const score of scores) {
+    if (!delegationScores[score.voter.toLowerCase()]) {
+      continue;
+    }
+
+    delegationScores[score.voter.toLowerCase()] = delegationScores[score.voter.toLowerCase()] - score.vp;
+    if (delegationScores[score.voter.toLowerCase()] === 0) {
+      delete delegationScores[score.voter.toLowerCase()];
+    }
+  }
 
   // Get only gauges where we have bribes
   for (let i = 0; i < proposal.choices.length; i++) {
@@ -268,6 +377,50 @@ const main = async () => {
     }
   }
 
+  fs.writeFileSync('tmp/mapBribesVotes.json', JSON.stringify(mapBribesVotes));
+
+
+  // We have to integrate delegation addresses
+  // They share rewards of each gauges
+  for (const delegationAddress of Object.keys(delegationScores)) {
+    const totalWeight = delegationScores[delegationAddress];
+    
+    for (const delegationVote of delegationVotes) {
+      const gaugeName = delegationVote.gaugeName;
+      const share = delegationVote.share;
+      const shareWeight = totalWeight * share / 100;
+
+      const voters = mapBribesVotes[gaugeName];
+      let found = false;
+      for (const voter of voters) {
+        if (voter.voter === delegationAddress.toLowerCase()) {
+          voter.weight += shareWeight;
+          found = true;
+          break;
+        }
+      }
+
+      if (!found) {
+        mapBribesVotes[gaugeName].push({
+          weight: shareWeight,
+          voter: delegationAddress.toLowerCase(),
+        });
+      }
+    }
+  }
+
+  // Remove delegation address
+  for (const gaugeKey of Object.keys(mapBribesVotes)) {
+    const newVoters = [];
+    for (const voter of mapBribesVotes[gaugeKey]) {
+      if (voter.voter.toLowerCase() !== DELEGATION_ADDRESS.toLowerCase()) {
+        newVoters.push(voter);
+      }
+    }
+
+    mapBribesVotes[gaugeKey] = newVoters;
+  }
+
   // Now, we have for each voters, the corresponding weight associated
   // We have to calculate their rewards
   for (const bribeName of Object.keys(mapBribesVotes)) {
@@ -286,7 +439,7 @@ const main = async () => {
       const rewardAmount = percentageWeight * totalReward / 100;
       mapBribeRewards[bribeName].push({
         voter: vote.voter.toLowerCase(),
-        amount: numberToBigNumber(rewardAmount.toString(), bribe.decimals),
+        amount: numberToBigNumber(rewardAmount.toFixed(6), bribe.decimals),
       });
     }
   }
