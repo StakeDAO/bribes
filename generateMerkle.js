@@ -6,23 +6,14 @@ const { gql, request } = require("graphql-request");
 const axios = require('axios').default;
 const { ethers, utils, BigNumber } = require("ethers");
 
-// INFURA
-const infura_json = require("./infura.json");
-const INFURA_KEY = infura_json.api_key;
-
 // LAST MERKLE
 const lastMerkle = require("./lastMerkle.json");
-const { exit } = require("process");
 
-/////////////////////////////////////////////////////////////////////////////////////////////
-//          EDIT PROVIDER AS NEEDED:                                                      //
-//
-const mainnetProvider = new ethers.providers.InfuraProvider("mainnet", INFURA_KEY);
-
-const MULTI_MERKLE_CONTRACT = "0x03e34b085c52985f6a5d27243f20c84bddc01db4";
-const MULTI_MERKLE_ABI = [{ "anonymous": false, "inputs": [{ "indexed": true, "internalType": "address", "name": "token", "type": "address" }, { "indexed": false, "internalType": "uint256", "name": "index", "type": "uint256" }, { "indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256" }, { "indexed": true, "internalType": "address", "name": "account", "type": "address" }, { "indexed": true, "internalType": "uint256", "name": "update", "type": "uint256" }], "name": "Claimed", "type": "event" }, { "anonymous": false, "inputs": [{ "indexed": true, "internalType": "address", "name": "token", "type": "address" }, { "indexed": true, "internalType": "bytes32", "name": "merkleRoot", "type": "bytes32" }, { "indexed": true, "internalType": "uint256", "name": "update", "type": "uint256" }], "name": "MerkleRootUpdated", "type": "event" }, { "anonymous": false, "inputs": [{ "indexed": true, "internalType": "address", "name": "previousOwner", "type": "address" }, { "indexed": true, "internalType": "address", "name": "newOwner", "type": "address" }], "name": "OwnershipTransferred", "type": "event" }, { "inputs": [{ "internalType": "address", "name": "token", "type": "address" }, { "internalType": "uint256", "name": "index", "type": "uint256" }, { "internalType": "address", "name": "account", "type": "address" }, { "internalType": "uint256", "name": "amount", "type": "uint256" }, { "internalType": "bytes32[]", "name": "merkleProof", "type": "bytes32[]" }], "name": "claim", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "account", "type": "address" }, { "components": [{ "internalType": "address", "name": "token", "type": "address" }, { "internalType": "uint256", "name": "index", "type": "uint256" }, { "internalType": "uint256", "name": "amount", "type": "uint256" }, { "internalType": "bytes32[]", "name": "merkleProof", "type": "bytes32[]" }], "internalType": "struct MultiMerkleStash.claimParam[]", "name": "claims", "type": "tuple[]" }], "name": "claimMulti", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "token", "type": "address" }, { "internalType": "uint256", "name": "index", "type": "uint256" }], "name": "isClaimed", "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "", "type": "address" }], "name": "merkleRoot", "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "owner", "outputs": [{ "internalType": "address", "name": "", "type": "address" }], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "renounceOwnership", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "newOwner", "type": "address" }], "name": "transferOwnership", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "", "type": "address" }], "name": "update", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "address", "name": "token", "type": "address" }, { "internalType": "bytes32", "name": "_merkleRoot", "type": "bytes32" }], "name": "updateMerkleRoot", "outputs": [], "stateMutability": "nonpayable", "type": "function" }];
+const SDT_ADDRESS = "0x73968b9a57c6E53d41345FD57a6E6ae27d6CDB2F";
+const DELEGATION_PREFIX = "delegation-";
 const ENDPOINT = "https://hub.snapshot.org/graphql";
 const ENDPOINT_DELEGATORS = "https://api.thegraph.com/subgraphs/name/snapshot-labs/snapshot";
+const ENDPOINT_CLAIM_BRIBES = "https://api.thegraph.com/subgraphs/name/pierremarsotlyon1/bribesclaims";
 const DELEGATION_ADDRESS = "0x52ea58f4FC3CEd48fa18E909226c1f8A0EF887DC";
 
 const QUERY_VOTES = gql`
@@ -102,6 +93,17 @@ query Proposal(
 }
 `;
 
+const CLAIM_BRIBES = gql`
+query Bribes {
+  lastClaimeds(first: 1000) {
+    id
+    addresses
+    updated
+    lastDistribution
+  }
+}
+`;
+
 const getAllDelegators = async (timestamp) => {
   let delegatorAddresses = [];
   let run = true;
@@ -125,37 +127,9 @@ const getAllDelegators = async (timestamp) => {
 };
 
 const getAllAccountClaimedSinceLastFreeze = async () => {
-  const mainnetContract = new ethers.Contract(
-    MULTI_MERKLE_CONTRACT,
-    MULTI_MERKLE_ABI,
-    mainnetProvider
-  );
-  let filter = await mainnetContract.filters.MerkleRootUpdated(
-    null,
-    null, // Freeze
-    null,
-  );
-  const updateMerkleEvents = await mainnetContract.queryFilter(filter);
-
-  // We only get the last merkle update (the freeze one)
-  const lastUpdateMerkleEvent = updateMerkleEvents[updateMerkleEvents.length - 1];
-  const blockNumber = lastUpdateMerkleEvent.blockNumber;
-
-  // Now we get all claimed since the last freeze
-  filter = await mainnetContract.filters.Claimed(
-    null,
-    null,
-    null,
-    null,
-    null,
-  );
-  const claimed = await mainnetContract.queryFilter(filter, blockNumber);
-
-  // Return all claimed account
-  return claimed.map(c => {
-    return { account: c.args.account, token: c.args.token };
-  });
-}
+  const result = await request(ENDPOINT_CLAIM_BRIBES, CLAIM_BRIBES, null);
+  return result.lastClaimeds;
+};
 
 /**
  * Get all votes for a proposal
@@ -256,12 +230,12 @@ const main = async () => {
   const idProposal = "0xbdf578fb77aed0ef179a9c91460b541976d41516136e713a1910d24bc89325f5";
   const bribes = [
     {
-      gaugeName: "f-stgusdc",
+      gaugeName: "crveth",
       token: "SDT",
       symbol: "SDT",
       image: "",
-      address: "0x73968b9a57c6E53d41345FD57a6E6ae27d6CDB2F",
-      amount: 30000,
+      address: SDT_ADDRESS,
+      amount: 21668,
       decimals: 18,
     },
     {
@@ -269,17 +243,49 @@ const main = async () => {
       token: "SDT",
       symbol: "SDT",
       image: "",
-      address: "0x73968b9a57c6E53d41345FD57a6E6ae27d6CDB2F",
-      amount: 8168,
+      address: SDT_ADDRESS,
+      amount: 5965,
       decimals: 18,
-    }
-  ];
-  const delegationVotes = [
+    },
+    {
+      gaugeName: "f-aleth",
+      token: "SDT",
+      symbol: "SDT",
+      image: "",
+      address: SDT_ADDRESS,
+      amount: 163,
+      decimals: 18,
+    },
+    {
+      gaugeName: "f-paleth",
+      token: "SDT",
+      symbol: "SDT",
+      image: "",
+      address: SDT_ADDRESS,
+      amount: 14497,
+      decimals: 18,
+    },
     {
       gaugeName: "f-stgusdc",
-      share: 100,
-    }
+      token: "SDT",
+      symbol: "SDT",
+      image: "",
+      address: SDT_ADDRESS,
+      amount: 35852,
+      decimals: 18,
+    },
+    {
+      gaugeName: "xdai-3pool",
+      token: "SDT",
+      symbol: "SDT",
+      image: "",
+      address: SDT_ADDRESS,
+      amount: 7010,
+      decimals: 18,
+    },
   ];
+  const delegationRewards = 50100;
+
   /***************************/
 
   // Create a map of bribe's names
@@ -289,9 +295,6 @@ const main = async () => {
 
   // Get all votes for a specific gauge vote
   const votes = await getVotes(idProposal);
-
-  fs.writeFileSync('tmp/votes.json', JSON.stringify(votes));
-
 
   // Get proposal
   const proposal = await getProposal(idProposal);
@@ -319,6 +322,9 @@ const main = async () => {
   }
   delete delegationScores[DELEGATION_ADDRESS];
 
+  fs.writeFileSync('tmp/delegationScores.json', JSON.stringify(delegationScores));
+
+
   // toLowerCase on all delegation addresses
   const delegationScoresClone = {...delegationScores};
   delegationScores = {};
@@ -339,6 +345,8 @@ const main = async () => {
       delete delegationScores[score.voter.toLowerCase()];
     }
   }
+
+  fs.writeFileSync('tmp/delegationScoresWithoutVote.json', JSON.stringify(delegationScores));
 
   // Get only gauges where we have bribes
   for (let i = 0; i < proposal.choices.length; i++) {
@@ -382,32 +390,32 @@ const main = async () => {
 
   // We have to integrate delegation addresses
   // They share rewards of each gauges
-  for (const delegationAddress of Object.keys(delegationScores)) {
-    const totalWeight = delegationScores[delegationAddress];
-    
-    for (const delegationVote of delegationVotes) {
-      const gaugeName = delegationVote.gaugeName;
-      const share = delegationVote.share;
-      const shareWeight = totalWeight * share / 100;
+  /*for (const delegationAddress of Object.keys(delegationScores)) {
+    const totalDelegationWeight = delegationScores[delegationAddress];
 
-      const voters = mapBribesVotes[gaugeName];
+    for (const bribe of bribes) {
+      if (bribe.delegationAmount === undefined || bribe.delegationAmount === null) {
+        continue;
+      }
+
+      const voters = mapBribesVotes[bribe.gaugeName];
       let found = false;
       for (const voter of voters) {
         if (voter.voter === delegationAddress.toLowerCase()) {
-          voter.weight += shareWeight;
+          voter.weight += totalDelegationWeight;
           found = true;
           break;
         }
       }
 
       if (!found) {
-        mapBribesVotes[gaugeName].push({
-          weight: shareWeight,
+        mapBribesVotes[bribe.gaugeName].push({
+          weight: totalDelegationWeight,
           voter: delegationAddress.toLowerCase(),
         });
       }
     }
-  }
+  }*/
 
   // Remove delegation address
   for (const gaugeKey of Object.keys(mapBribesVotes)) {
@@ -421,40 +429,59 @@ const main = async () => {
     mapBribesVotes[gaugeKey] = newVoters;
   }
 
+  fs.writeFileSync('tmp/mapBribesVotes.json', JSON.stringify(mapBribesVotes));
+
+
   // Now, we have for each voters, the corresponding weight associated
   // We have to calculate their rewards
   for (const bribeName of Object.keys(mapBribesVotes)) {
     const bribe = bribes.find(b => b.gaugeName === bribeName);
-    const totalReward = bribe.amount;
     const votes = mapBribesVotes[bribeName];
 
     // Calculate the total weight for all users
     const totalWeight = votes.reduce((acc, v) => acc + v.weight, 0.0);
+    //const totalVotingPowerDelegation = Object.values(delegationScores).reduce((acc, v) => acc + v, 0);
 
     // We have the total weight + the weight of each voters
     // We can calculate the reward amount for each of them
     mapBribeRewards[bribeName] = [];
     for (const vote of votes) {
       const percentageWeight = vote.weight * 100 / totalWeight;
-      const rewardAmount = percentageWeight * totalReward / 100;
+      const rewardAmount = percentageWeight * bribe.amount / 100;
       mapBribeRewards[bribeName].push({
         voter: vote.voter.toLowerCase(),
         amount: numberToBigNumber(rewardAmount.toFixed(6), bribe.decimals),
+        amountNumber: rewardAmount.toFixed(6),
       });
     }
   }
 
+  // Now add delegation addresses
+  const totalDelegationVotingPower = Object.values(delegationScores).reduce((acc, vp) => acc + vp, 0.0);
+  for (const delegationAddress of Object.keys(delegationScores)) {
+    const percentageWeight = delegationScores[delegationAddress] * 100 / totalDelegationVotingPower;
+    const rewardAmount = percentageWeight * delegationRewards / 100;
+    mapBribeRewards[DELEGATION_PREFIX + delegationAddress] = [{
+      voter: delegationAddress.toLowerCase(),
+      amount: numberToBigNumber(rewardAmount.toFixed(6), 18), // SDT
+      amountNumber: rewardAmount.toFixed(6),
+    }];
+  }
+
+  fs.writeFileSync('tmp/mapBribeRewards.json', JSON.stringify(mapBribeRewards));
+  
   // mapBribeRewards contains the reward amount of each users for each gauges bribed
   // Now, we have to know who claimed their rewards
   const claimedData = await getAllAccountClaimedSinceLastFreeze();
 
-  // Organize if my tokens
+  // Organize it by tokens
   const claimedByTokens = {};
   for (const cd of claimedData) {
-    if (!claimedByTokens[cd.token]) {
-      claimedByTokens[cd.token] = [];
+    if (!claimedByTokens[cd.id]) {
+      claimedByTokens[cd.id.toLowerCase()] = [];
     }
-    claimedByTokens[cd.token].push(cd.account.toLowerCase());
+
+    claimedByTokens[cd.id.toLowerCase()] = claimedByTokens[cd.id.toLowerCase()].concat(cd.addresses.map((a) => a.toLowerCase()));
   }
 
   // Now, we get users who didn't claim yet last rewards
@@ -466,14 +493,14 @@ const main = async () => {
 
     // If we don't have claim for this token, so all users need to claim yet
     // We create an empty array which allow all users in the next loop to claim
-    if (!claimedByTokens[bribe.address]) {
-      claimedByTokens[bribe.address] = [];
+    if (!claimedByTokens[bribe.address.toLowerCase()]) {
+      claimedByTokens[bribe.address.toLowerCase()] = [];
     }
 
     for (const key of Object.keys(bribe.merkle)) {
 
       //If the user didn't claim, we add him
-      if (claimedByTokens[bribe.address].indexOf(key.toLowerCase()) === -1) {
+      if (claimedByTokens[bribe.address.toLowerCase()].indexOf(key.toLowerCase()) === -1) {
         usersWhoNeedClaim[bribe.address].push({
           account: key.toLowerCase(),
           amount: BigNumber.from(bribe.merkle[key].amount),
@@ -485,7 +512,14 @@ const main = async () => {
   // Now, we add them in the new distribution
   for (const gaugeName of Object.keys(mapBribeRewards)) {
     // Get token address
-    const tokenAddress = bribes.find(b => b.gaugeName === gaugeName).address;
+    let tokenAddress = null;
+
+    // SDT for delegation users
+    if (gaugeName.startsWith(DELEGATION_PREFIX)) {
+      tokenAddress = SDT_ADDRESS;
+    } else {
+      tokenAddress = bribes.find(b => b.gaugeName === gaugeName).address;
+    }
 
     // Check if we have a previous distribution to do for this token address
     if (!usersWhoNeedClaim[tokenAddress]) {
@@ -517,6 +551,7 @@ const main = async () => {
   // IMPORTANT 
   // Increment the index [0, ...] for each tokens
   const global = [];
+  const localGlobal = [];
   for (const tokenAddress of Object.keys(usersWhoNeedClaim)) {
     let bribe = bribes.find(b => b.address === tokenAddress);
     if (!bribe) {
@@ -541,6 +576,7 @@ const main = async () => {
     const merkleTree = new MerkleTree(elements, keccak256, { sort: true });
 
     let res = {};
+    let localRes = [];
 
     for (let i = 0; i < users.length; i++) {
       const user = users[i];
@@ -549,6 +585,11 @@ const main = async () => {
         amount: BigNumber.from(user.amount),
         proof: merkleTree.getHexProof(elements[i]),
       };
+
+      localRes.push({
+        address: user.address.toLowerCase(),
+        amount: (BigNumber.from(user.amount).div(BigNumber.from(10).pow(15)).toNumber() / 1000).toString(),
+      });
     }
 
     global.push({
@@ -557,10 +598,19 @@ const main = async () => {
       "image": bribe.image,
       "merkle": res,
       root: merkleTree.getHexRoot(),
+      "total": Object.values(res).reduce((acc, o) => acc.add(o.amount), BigNumber.from(0))
+    });
+
+    localGlobal.push({
+      "symbol": bribe.symbol,
+      "address": bribe.address,
+      "merkle": localRes,
     });
   }
 
   fs.writeFileSync('merkle.json', JSON.stringify(global));
+  fs.writeFileSync('tmp/localGlobal.json', JSON.stringify(localGlobal));
+
 }
 
 main();
