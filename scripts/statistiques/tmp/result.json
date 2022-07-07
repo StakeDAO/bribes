@@ -1,52 +1,52 @@
 [
  {
   "round": 21,
-  "totalDollar": 122122.05290000001,
+  "totalDollar": 124061.97970000001,
   "totalVeCRV": 29569860,
-  "averageDollarPerVeCRV": 0.004129950324418175,
-  "ts": 1657179920,
+  "averageDollarPerVeCRV": 0.004195555193700613,
+  "ts": 1657185384,
   "gauges": [
    {
-    "name": "Curve.fi alETH+ETH-f Gauge Deposit",
+    "name": "Curve.fi alETH+ETH-f ",
     "address": "0x12dCD9E8D1577b5E4F066d8e7D404404Ef045342",
-    "dollarAveragePerVeCRV": 0.010623454545454547,
-    "totalDollar": 5842.900000000001
+    "dollarAveragePerVeCRV": 0.010818181818181819,
+    "totalDollar": 5950
    },
    {
-    "name": "Curve.fi PALETH-f Gauge Deposit",
+    "name": "Curve.fi PALETH-f ",
     "address": "0x4fb13b55D6535584841dbBdb14EDC0258F7aC414",
     "dollarAveragePerVeCRV": 0.0047043810000000005,
     "totalDollar": 6115.6953
    },
    {
-    "name": "Curve.fi crvTETH Gauge Deposit",
+    "name": "Curve.fi crvTETH ",
     "address": "0x6070fBD4E608ee5391189E7205d70cc4A274c017",
-    "dollarAveragePerVeCRV": 0.0049304738,
-    "totalDollar": 9860.9476
+    "dollarAveragePerVeCRV": 0.0049494522,
+    "totalDollar": 9898.9044
    },
    {
-    "name": "Curve.fi crvCVXETH Gauge Deposit",
+    "name": "Curve.fi crvCVXETH ",
     "address": "0x7e1444ba99dcdffe8fbdb42c02f0005d14f13be1",
-    "dollarAveragePerVeCRV": 0.0036229306111812145,
-    "totalDollar": 21131.25
+    "dollarAveragePerVeCRV": 0.0036922388489603335,
+    "totalDollar": 21535.5
    },
    {
-    "name": "Curve.fi x3CRV Gauge Deposit",
+    "name": "Curve.fi x3CRV ",
     "address": "0xb721cc32160ab0da2614cc6ab16ed822aeebc101",
-    "dollarAveragePerVeCRV": 0.004617692748654619,
-    "totalDollar": 11551.26
+    "dollarAveragePerVeCRV": 0.0046564771367191655,
+    "totalDollar": 11648.28
    },
    {
-    "name": "Curve.fi cvxFXSFXS-f Gauge Deposit",
+    "name": "Curve.fi cvxFXSFXS-f ",
     "address": "0xab1927160ec7414c6fa71763e2a9f3d107c126dd",
-    "dollarAveragePerVeCRV": 0.003965866103633324,
-    "totalDollar": 33810
+    "dollarAveragePerVeCRV": 0.004041734846485441,
+    "totalDollar": 34456.8
    },
    {
-    "name": "Curve.fi cvxcrv-f Gauge Deposit",
+    "name": "Curve.fi cvxcrv-f ",
     "address": "0x903da6213a5a12b61c821598154efad98c3b20e4",
-    "dollarAveragePerVeCRV": 0.0038158341429236986,
-    "totalDollar": 33810
+    "dollarAveragePerVeCRV": 0.003888832709136152,
+    "totalDollar": 34456.8
    }
   ]
  }

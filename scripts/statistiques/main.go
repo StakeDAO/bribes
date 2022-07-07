@@ -9,6 +9,7 @@ import (
 	"main/interfaces"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/robfig/cron"
@@ -74,6 +75,7 @@ func collect() {
 	gaugeNames := make(map[string]string, 0)
 
 	for _, quest := range quests {
+		fmt.Println(quest.Metadata.InitialRewardsAmount)
 		addIntoMap(totalDollarRewardsPerGauge, quest.Gauge, quest.Metadata.InitialRewardsAmount)
 		addIntoMap(totalVeCRVPerGauge, quest.Gauge, quest.Metadata.ObjectiveVotes)
 		gaugeNames[quest.Gauge] = quest.Metadata.Name
@@ -113,7 +115,7 @@ func collect() {
 		gauge := new(interfaces.Gauge)
 		gauge.DollarAveragePerVeCRV = totalDollarRewards / totalGaugeVeCRV
 		gauge.GaugeAddress = gaugeAddress
-		gauge.Name = gaugeNames[gaugeAddress]
+		gauge.Name = strings.Replace(gaugeNames[gaugeAddress], "Gauge Deposit", "", -1)
 		gauge.TotalDollar = totalDollarRewards
 
 		result.Gauges = append(result.Gauges, *gauge)
