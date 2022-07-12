@@ -8,6 +8,7 @@ const { ethers, utils, BigNumber } = require("ethers");
 
 // LAST MERKLE
 const lastMerkle = require("./lastMerkle.json");
+const { parse } = require("path");
 
 const SDT_ADDRESS = "0x73968b9a57c6E53d41345FD57a6E6ae27d6CDB2F";
 const DELEGATION_PREFIX = "delegation-";
@@ -227,33 +228,15 @@ const numberToBigNumber = (n, decimals) => {
 const main = async () => {
 
   /*********** Inputs ********/
-  const idProposal = "0xbdf578fb77aed0ef179a9c91460b541976d41516136e713a1910d24bc89325f5";
+  const idProposal = "0x05f54bb78050ee1ad4a9aeeae76bfed6eeb389a667c2fc4a8006e4f38a0751a6";
   const bribes = [
-    {
-      gaugeName: "crveth",
-      token: "SDT",
-      symbol: "SDT",
-      image: "",
-      address: SDT_ADDRESS,
-      amount: 21668,
-      decimals: 18,
-    },
-    {
-      gaugeName: "tricrypto2",
-      token: "SDT",
-      symbol: "SDT",
-      image: "",
-      address: SDT_ADDRESS,
-      amount: 5965,
-      decimals: 18,
-    },
     {
       gaugeName: "f-aleth",
       token: "SDT",
       symbol: "SDT",
       image: "",
       address: SDT_ADDRESS,
-      amount: 163,
+      amount: 7159 + 7385 - 14450,
       decimals: 18,
     },
     {
@@ -262,16 +245,34 @@ const main = async () => {
       symbol: "SDT",
       image: "",
       address: SDT_ADDRESS,
-      amount: 14497,
+      amount: 5426 + 3494,
       decimals: 18,
     },
     {
-      gaugeName: "f-stgusdc",
+      gaugeName: "crveth",
       token: "SDT",
       symbol: "SDT",
       image: "",
       address: SDT_ADDRESS,
-      amount: 35852,
+      amount: 11244 + 15018 - 20993,
+      decimals: 18,
+    },
+    {
+      gaugeName: "tricrypto2",
+      token: "SDT",
+      symbol: "SDT",
+      image: "",
+      address: SDT_ADDRESS,
+      amount: 2211  + 2466,
+      decimals: 18,
+    },
+    {
+      gaugeName: "f-cvxcrv",
+      token: "SDT",
+      symbol: "SDT",
+      image: "",
+      address: SDT_ADDRESS,
+      amount: 82016,
       decimals: 18,
     },
     {
@@ -280,11 +281,11 @@ const main = async () => {
       symbol: "SDT",
       image: "",
       address: SDT_ADDRESS,
-      amount: 7010,
+      amount: 28555 - 25331,
       decimals: 18,
-    },
+    }
   ];
-  const delegationRewards = 50100;
+  const delegationRewards = 142789;
 
   /***************************/
 
@@ -302,10 +303,15 @@ const main = async () => {
   // Get all votes
   const voters = votes.map((v) => v.voter);
 
+  fs.writeFileSync('tmp/voters.json', JSON.stringify(voters));
+
+
   const scores = await getScores(proposal, votes, voters);
+  fs.writeFileSync('tmp/scores.json', JSON.stringify(scores));
 
   // Get all delegator addresses
   const delegatorAddresses = await getAllDelegators(proposal.created);
+  
   let delegationScores = await getDelegationScores(proposal, delegatorAddresses.concat([DELEGATION_ADDRESS]));
 
   // Share voting power of delegation address
@@ -322,8 +328,7 @@ const main = async () => {
   }
   delete delegationScores[DELEGATION_ADDRESS];
 
-  fs.writeFileSync('tmp/delegationScores.json', JSON.stringify(delegationScores));
-
+  fs.writeFileSync('tmp/test_delegationScores.json', JSON.stringify(delegationScores));
 
   // toLowerCase on all delegation addresses
   const delegationScoresClone = {...delegationScores};
@@ -448,6 +453,7 @@ const main = async () => {
     for (const vote of votes) {
       const percentageWeight = vote.weight * 100 / totalWeight;
       const rewardAmount = percentageWeight * bribe.amount / 100;
+
       mapBribeRewards[bribeName].push({
         voter: vote.voter.toLowerCase(),
         amount: numberToBigNumber(rewardAmount.toFixed(6), bribe.decimals),
@@ -605,6 +611,7 @@ const main = async () => {
       "symbol": bribe.symbol,
       "address": bribe.address,
       "merkle": localRes,
+      "total": localRes.reduce((acc, o) => acc + parseFloat(o.amount), 0)
     });
   }
 
