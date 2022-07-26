@@ -228,15 +228,24 @@ const numberToBigNumber = (n, decimals) => {
 const main = async () => {
 
   /*********** Inputs ********/
-  const idProposal = "0x05f54bb78050ee1ad4a9aeeae76bfed6eeb389a667c2fc4a8006e4f38a0751a6";
+  const idProposal = "bafkreicgvjloarkfdl5m4ktiujhnss34xw3ba65sfyirbydeviv2sjhbf4";
   const bribes = [
     {
-      gaugeName: "f-aleth",
+      gaugeName: "tricrypto2",
       token: "SDT",
       symbol: "SDT",
       image: "",
       address: SDT_ADDRESS,
-      amount: 7159 + 7385 - 14450,
+      amount: 8502,
+      decimals: 18,
+    },
+    {
+      gaugeName: "teth",
+      token: "SDT",
+      symbol: "SDT",
+      image: "",
+      address: SDT_ADDRESS,
+      amount: 7278,
       decimals: 18,
     },
     {
@@ -245,47 +254,11 @@ const main = async () => {
       symbol: "SDT",
       image: "",
       address: SDT_ADDRESS,
-      amount: 5426 + 3494,
-      decimals: 18,
-    },
-    {
-      gaugeName: "crveth",
-      token: "SDT",
-      symbol: "SDT",
-      image: "",
-      address: SDT_ADDRESS,
-      amount: 11244 + 15018 - 20993,
-      decimals: 18,
-    },
-    {
-      gaugeName: "tricrypto2",
-      token: "SDT",
-      symbol: "SDT",
-      image: "",
-      address: SDT_ADDRESS,
-      amount: 2211  + 2466,
-      decimals: 18,
-    },
-    {
-      gaugeName: "f-cvxcrv",
-      token: "SDT",
-      symbol: "SDT",
-      image: "",
-      address: SDT_ADDRESS,
-      amount: 82016,
-      decimals: 18,
-    },
-    {
-      gaugeName: "xdai-3pool",
-      token: "SDT",
-      symbol: "SDT",
-      image: "",
-      address: SDT_ADDRESS,
-      amount: 28555 - 25331,
+      amount: 7740 + 1035,
       decimals: 18,
     }
   ];
-  const delegationRewards = 142789;
+  const delegationRewards = 192460;
 
   /***************************/
 
