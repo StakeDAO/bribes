@@ -1910,7 +1910,7 @@
     {
         "symbol": "SDT",
         "address": "0x73968b9a57c6E53d41345FD57a6E6ae27d6CDB2F",
-        "image": "",
+        "image": "https://assets.coingecko.com/coins/images/13724/small/stakedao_logo.jpg?1611195011",
         "merkle": {
             "0x210a3428d10bf9a68f339006141803f3513e976a": {
                 "index": 0,
