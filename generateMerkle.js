@@ -11,7 +11,10 @@ const lastMerkle = require("./lastMerkle.json");
 const { parse } = require("path");
 
 const SDT_ADDRESS = "0x73968b9a57c6E53d41345FD57a6E6ae27d6CDB2F";
+const GNO_ADDRESS = "0x6810e776880C02933D47DB1b9fc05908e5386b96";
+
 const DELEGATION_PREFIX = "delegation-";
+const DELEGATION_EXTRA_REWARD_PREFIX = "@";
 const ENDPOINT = "https://hub.snapshot.org/graphql";
 const ENDPOINT_DELEGATORS = "https://api.thegraph.com/subgraphs/name/snapshot-labs/snapshot";
 const ENDPOINT_CLAIM_BRIBES = "https://api.thegraph.com/subgraphs/name/pierremarsotlyon1/bribesclaims";
@@ -228,37 +231,86 @@ const numberToBigNumber = (n, decimals) => {
 const main = async () => {
 
   /*********** Inputs ********/
-  const idProposal = "bafkreicgvjloarkfdl5m4ktiujhnss34xw3ba65sfyirbydeviv2sjhbf4";
+  const idProposal = "0x23ef04a01afc8fe34450273fdbbfd481dafd521fccba162365e982e5d868b08c";
   const bribes = [
+    {
+      gaugeName: "crveth",
+      token: "SDT",
+      symbol: "SDT",
+      image: "https://assets.coingecko.com/coins/images/13724/small/stakedao_logo.jpg?1611195011",
+      address: SDT_ADDRESS,
+      amount: 61471 + 61173 - 114666,
+      decimals: 18,
+    },
+    {
+      gaugeName: "cvxeth",
+      token: "SDT",
+      symbol: "SDT",
+      image: "https://assets.coingecko.com/coins/images/13724/small/stakedao_logo.jpg?1611195011",
+      address: SDT_ADDRESS,
+      amount: 87,
+      decimals: 18,
+    },
     {
       gaugeName: "tricrypto2",
       token: "SDT",
       symbol: "SDT",
-      image: "",
+      image: "https://assets.coingecko.com/coins/images/13724/small/stakedao_logo.jpg?1611195011",
       address: SDT_ADDRESS,
-      amount: 8502,
+      amount: 3571 + 3642,
       decimals: 18,
     },
     {
-      gaugeName: "teth",
+      gaugeName: "f-aleth",
       token: "SDT",
       symbol: "SDT",
-      image: "",
+      image: "https://assets.coingecko.com/coins/images/13724/small/stakedao_logo.jpg?1611195011",
       address: SDT_ADDRESS,
-      amount: 7278,
+      amount: 1,
       decimals: 18,
     },
     {
       gaugeName: "f-paleth",
       token: "SDT",
       symbol: "SDT",
-      image: "",
+      image: "https://assets.coingecko.com/coins/images/13724/small/stakedao_logo.jpg?1611195011",
       address: SDT_ADDRESS,
-      amount: 7740 + 1035,
+      amount: 3403,
+      decimals: 18,
+    },
+    {
+      gaugeName: "f-stgusdc",
+      token: "SDT",
+      symbol: "SDT",
+      image: "https://assets.coingecko.com/coins/images/13724/small/stakedao_logo.jpg?1611195011",
+      address: SDT_ADDRESS,
+      amount: 36885 - 29467,
+      decimals: 18,
+    },
+    {
+      gaugeName: "xdai-3pool",
+      symbol: "GNO",
+      address: GNO_ADDRESS,
+      image: "https://assets.coingecko.com/coins/images/662/small/logo_square_simple_300px.png?1609402668",
+      amount: 38.5,
       decimals: 18,
     }
   ];
-  const delegationRewards = 192460;
+  const delegationRewards = 154291;
+  const otcDelegation = [
+    {
+      symbol: "GNO",
+      address: GNO_ADDRESS,
+      amount: 150.9,
+      image: "https://assets.coingecko.com/coins/images/662/small/logo_square_simple_300px.png?1609402668",
+      decimals: 18,
+    }
+  ];
+
+  // SDT extra rewards
+  const extraRewardsPerAddress = {
+    "0xb0e83c2d71a991017e0116d58c5765abc57384af": 1047
+  };
 
   /***************************/
 
@@ -355,6 +407,12 @@ const main = async () => {
         // Calculate the weight associated to the vote based on the total voting power to the user
         // Example : if a have 2000 in voting power and i voted for 2 gauges at 50/50
         // I will have 1000 in weight for each
+
+        // We remove alchemix for f-aleth
+        if (mapNameBribes[parseInt(key)] === "f-aleth" && score.voter.toLowerCase() === "0xf872703f1c8f93fa186869bac83bac5a0c87c3c8") {
+          continue;
+        }
+
         mapBribesVotes[mapNameBribes[parseInt(key)]].push({
           weight: parseFloat(score.choice[key]) * 100 / totalWeight * score.vp / 100,
           voter: score.voter.toLowerCase(),
@@ -418,6 +476,7 @@ const main = async () => {
 
     // Calculate the total weight for all users
     const totalWeight = votes.reduce((acc, v) => acc + v.weight, 0.0);
+
     //const totalVotingPowerDelegation = Object.values(delegationScores).reduce((acc, v) => acc + v, 0);
 
     // We have the total weight + the weight of each voters
@@ -445,6 +504,19 @@ const main = async () => {
       amount: numberToBigNumber(rewardAmount.toFixed(6), 18), // SDT
       amountNumber: rewardAmount.toFixed(6),
     }];
+  }
+
+  // Add extra rewards delegation
+  for (const extraReward of otcDelegation) {
+    for (const delegationAddress of Object.keys(delegationScores)) {
+      const percentageWeight = delegationScores[delegationAddress] * 100 / totalDelegationVotingPower;
+      const rewardAmount = percentageWeight * extraReward.amount / 100;
+      mapBribeRewards[DELEGATION_PREFIX + delegationAddress + DELEGATION_EXTRA_REWARD_PREFIX + extraReward.address] = [{
+        voter: delegationAddress.toLowerCase(),
+        amount: numberToBigNumber(rewardAmount.toFixed(6), extraReward.decimals),
+        amountNumber: rewardAmount.toFixed(6),
+      }];
+    }
   }
 
   fs.writeFileSync('tmp/mapBribeRewards.json', JSON.stringify(mapBribeRewards));
@@ -493,9 +565,14 @@ const main = async () => {
     // Get token address
     let tokenAddress = null;
 
-    // SDT for delegation users
+    // SDT or extra reward for delegation users
     if (gaugeName.startsWith(DELEGATION_PREFIX)) {
-      tokenAddress = SDT_ADDRESS;
+      const indexOfArrobase = gaugeName.indexOf(DELEGATION_EXTRA_REWARD_PREFIX);
+      if (indexOfArrobase > -1) {
+        tokenAddress = gaugeName.substring(indexOfArrobase + 1, gaugeName.length);
+      } else {
+        tokenAddress = SDT_ADDRESS;
+      }
     } else {
       tokenAddress = bribes.find(b => b.gaugeName === gaugeName).address;
     }
@@ -537,6 +614,12 @@ const main = async () => {
       // Maybe an old bribe in the last merkle
       bribe = lastMerkle.find(b => b.address === tokenAddress);
     }
+
+    if (!bribe) {
+      // Maybe an OTC deal
+      bribe = otcDelegation.find((o) => o.address === tokenAddress);
+    }
+
     const usersEligible = usersWhoNeedClaim[tokenAddress];
     const users = [];
 
@@ -559,9 +642,17 @@ const main = async () => {
 
     for (let i = 0; i < users.length; i++) {
       const user = users[i];
+
+      let amount = BigNumber.from(user.amount);
+
+      if (bribe.address === SDT_ADDRESS) {
+        if (extraRewardsPerAddress[user.address.toLowerCase()]) {
+          amount = amount.add(BigNumber.from(extraRewardsPerAddress[user.address.toLowerCase()]).mul(BigNumber.from(10).pow(18)));
+        }
+      }
       res[user.address.toLowerCase()] = {
         index: user.index,
-        amount: BigNumber.from(user.amount),
+        amount: amount,
         proof: merkleTree.getHexProof(elements[i]),
       };
 
