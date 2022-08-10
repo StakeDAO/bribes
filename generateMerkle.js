@@ -631,9 +631,16 @@ const main = async () => {
       });
     }
 
-    const elements = users.map((x) =>
-      utils.solidityKeccak256(["uint256", "address", "uint256"], [x.index, x.address.toLowerCase(), x.amount])
-    );
+    const elements = users.map((x) => {
+      let amount = BigNumber.from(x.amount);
+      if (bribe.address === SDT_ADDRESS) {
+        if (extraRewardsPerAddress[x.address.toLowerCase()]) {
+          amount = amount.add(BigNumber.from(extraRewardsPerAddress[x.address.toLowerCase()]).mul(BigNumber.from(10).pow(18)));
+        }
+      }
+
+      return utils.solidityKeccak256(["uint256", "address", "uint256"], [x.index, x.address.toLowerCase(), amount]);
+    });
 
     const merkleTree = new MerkleTree(elements, keccak256, { sort: true });
 
