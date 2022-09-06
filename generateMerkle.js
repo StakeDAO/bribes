@@ -444,8 +444,8 @@ const bribesRun = async (idProposal, space, bribes, delegationRewards, otcDelega
 const main = async () => {
 
   /*********** Inputs ********/
-  const crvIdProposal = "0x318b3fffebf5b2bb7421c95ab41713e9b46fa04527d9223bb85cfb36f6ce09df";
-  const balIdProposal = "0x5075519f5441a8026f58def0fd0f457a800d111bb9eab2ef3fb0a61bc0d68f0b";
+  const crvIdProposal = "0xdef2b77cde9cbb353673d99e4d725c1afb5b9b957046d907000340ad825e1a37";
+  const balIdProposal = "0x6559ee3227d1dd77e466fe1024c6295762a2916800813801d565b26559cf26a8";
 
   const crvBribes = [
     {
@@ -454,7 +454,7 @@ const main = async () => {
       symbol: "SDT",
       image: "https://assets.coingecko.com/coins/images/13724/small/stakedao_logo.jpg?1611195011",
       address: SDT_ADDRESS,
-      amount: 88118.94826 + 81736.02243 - 163523,
+      amount: 57962.62 + 53064.61 - 98250,
       decimals: 18,
     },
     {
@@ -463,7 +463,16 @@ const main = async () => {
       symbol: "SDT",
       image: "https://assets.coingecko.com/coins/images/13724/small/stakedao_logo.jpg?1611195011",
       address: SDT_ADDRESS,
-      amount: 3512.60908 + 3397.98794,
+      amount: 7135.94 + 6833.12,
+      decimals: 18,
+    },
+    {
+      gaugeName: "f-stgusdc",
+      token: "SDT",
+      symbol: "SDT",
+      image: "https://assets.coingecko.com/coins/images/13724/small/stakedao_logo.jpg?1611195011",
+      address: SDT_ADDRESS,
+      amount: 93112.53 - 87440,
       decimals: 18,
     },
     {
@@ -472,37 +481,28 @@ const main = async () => {
       symbol: "SDT",
       image: "https://assets.coingecko.com/coins/images/13724/small/stakedao_logo.jpg?1611195011",
       address: SDT_ADDRESS,
-      amount: 39619.11309 - 26523,
-      decimals: 18,
-    },
-    {
-      gaugeName: "apeUSDFRAXBP",
-      token: "SDT",
-      symbol: "SDT",
-      image: "https://assets.coingecko.com/coins/images/13724/small/stakedao_logo.jpg?1611195011",
-      address: SDT_ADDRESS,
-      amount: 15186.39000 - 7077,
+      amount: 38114.60 - 15518,
       decimals: 18,
     }
   ]
 
   const balBribes = [
     {
-      gaugeName: "WETH 50 / COW 50",
+      gaugeName: "WMATIC / MaticX",
       token: "SDT",
       symbol: "SDT",
       image: "https://assets.coingecko.com/coins/images/13724/small/stakedao_logo.jpg?1611195011",
       address: SDT_ADDRESS,
-      amount: 2727.41330,
+      amount: 6006.27 + 1263.64 - 6206,
       decimals: 18,
     },
     {
-      gaugeName: "B-80BAL-20WETH / sdBAL",
+      gaugeName: "BADGER 80 / WBTC 20",
       token: "SDT",
       symbol: "SDT",
       image: "https://assets.coingecko.com/coins/images/13724/small/stakedao_logo.jpg?1611195011",
       address: SDT_ADDRESS,
-      amount: 3793.97903 - 3123,
+      amount: 69.20,
       decimals: 18,
     }
   ];
@@ -510,16 +510,16 @@ const main = async () => {
   const bribes = crvBribes.concat(balBribes);
 
   // Delegations
-  const crvDelegationRewards = 26523 + 163523 + 7077;
-  const balDelegationRewards = 3123;
+  const crvDelegationRewards = 15518 + 87440 + 98250;
+  const balDelegationRewards = 6206;
 
   // OTC
   const crvOtcDelegation = [];
   const balOtcDelegation = [];
+
   // SDT extra rewards
-  const extraRewardsPerAddress = {
-    "0xb0e83c2d71a991017e0116d58c5765abc57384af": 1047
-  };
+  const extraRewardsPerAddress = {};
+
   const crvMapBribeRewards = await bribesRun(crvIdProposal, "sdcrv.eth", crvBribes, crvDelegationRewards, crvOtcDelegation);
   const balMapBribeRewards = await bribesRun(balIdProposal, "sdbal.eth", balBribes, balDelegationRewards, balOtcDelegation);
 
