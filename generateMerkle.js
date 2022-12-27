@@ -415,6 +415,7 @@ const bribesRun = async (idProposal, space, bribes, delegationRewards, otcDelega
       voter: delegationAddress.toLowerCase(),
       amount: numberToBigNumber(rewardAmount.toFixed(6), 18), // SDT
       amountNumber: rewardAmount.toFixed(6),
+      tokenAddress: bribes[0].address,
     }];
   }
 
@@ -438,10 +439,10 @@ const bribesRun = async (idProposal, space, bribes, delegationRewards, otcDelega
 const main = async () => {
 
   /*********** Inputs ********/
-  const crvIdProposal = "0x56f6d1c1393056d49309602ddb8907a73bc48f0c878d149a55dcfe6cde2aa23a";
-  const balIdProposal = "0x3b25e19a9410e068bfe3dbb930970b5f534857171464e157f9666a33d154c5d5";
-  const fraxIdProposal = "0xd33a5d22ea1a58e7972d269cb2915c02e9d8716c91ae7a65b287a751830ace59";
-  const angleIdProposal = "0x98bd0311484a31626cb318a001eceaad4415c7d964f33430221c5ac71660c665";
+  const crvIdProposal = "0xe40d037543c0a42f769ba40520aa94331296ed37459a649daf2b1b7b6dc6c625";
+  const balIdProposal = "0x7bef4055a9831fadffad5d74aacb7d623455b2e4da21b5f3d64a79b81de98fee";
+  const fraxIdProposal = "0x1a4913d901491bcc87d9dcb2f4e68e22f43ef23518481f961099827ab767e46c";
+  const angleIdProposal = "0x119c6506056b173d9e6eec6b953c178db18e4b843563ad4677cb68ca1f09c9a7";
 
   const crvBribes = [
     {
@@ -450,7 +451,7 @@ const main = async () => {
       symbol: "SDT",
       image: "https://assets.coingecko.com/coins/images/13724/small/stakedao_logo.jpg?1611195011",
       address: SDT_ADDRESS,
-      amount: 7131.08 + 32.78 + 422.66 + 7748.34 + 162.66,
+      amount: 46209.83 + 45.53 + 349.16 + 29297.90 + 211.08 + 29.41 - 57356.609,
       decimals: 18,
     },
     {
@@ -459,7 +460,7 @@ const main = async () => {
       symbol: "SDT",
       image: "https://assets.coingecko.com/coins/images/13724/small/stakedao_logo.jpg?1611195011",
       address: SDT_ADDRESS,
-      amount: 79908.77 + 2078.20 + 572.66 + 74724.91 - 126704.116,
+      amount: 80825.26 + 904.48 + 453.94 + 69803.13 - 134381.012,
       decimals: 18,
     },
     {
@@ -468,7 +469,7 @@ const main = async () => {
       symbol: "SDT",
       image: "https://assets.coingecko.com/coins/images/13724/small/stakedao_logo.jpg?1611195011",
       address: SDT_ADDRESS,
-      amount: 5904.09 + 6905.62,
+      amount: 7981.67 + 6004.84,
       decimals: 18,
     },
     {
@@ -477,51 +478,70 @@ const main = async () => {
       symbol: "SDT",
       image: "https://assets.coingecko.com/coins/images/13724/small/stakedao_logo.jpg?1611195011",
       address: SDT_ADDRESS,
-      amount: 72171.01 + 74935.13 - 134320.670,
+      amount: 43201.76 + 49436.89 - 76051.282,
       decimals: 18,
     }
   ]
 
   const balBribes = [
     {
-      gaugeName: "80palStkAAVE-20AAVE - 0x39a9E78c3b9b5B4…Cf",
-      token: "SDT",
-      symbol: "SDT",
-      image: "https://assets.coingecko.com/coins/images/13724/small/stakedao_logo.jpg?1611195011",
-      address: SDT_ADDRESS,
-      amount: 622.54 + 620.72,
+      gaugeName: "80palStkAAVE-20AAVE",
+      token: "sdBAL",
+      symbol: "sdBAL",
+      image: "https://cryptologos.cc/logos/balancer-bal-logo.png",
+      address: "0xF24d8651578a55b0C119B9910759a351A3458895",
+      amount: 52.68 + 51.65,
       decimals: 18,
     },
     {
-      gaugeName: "50WETH-50AURA - 0x275dF57d2B23d53…00",
-      token: "SDT",
-      symbol: "SDT",
-      image: "https://assets.coingecko.com/coins/images/13724/small/stakedao_logo.jpg?1611195011",
-      address: SDT_ADDRESS,
-      amount: 2683.97,
+      gaugeName: "USDC-PAL",
+      token: "sdBAL",
+      symbol: "sdBAL",
+      image: "https://cryptologos.cc/logos/balancer-bal-logo.png",
+      address: "0xF24d8651578a55b0C119B9910759a351A3458895",
+      amount: 13.64 + 13.37,
+      decimals: 18,
+    },
+    {
+      gaugeName: "20WBTC-80BADGER",
+      token: "sdBAL",
+      symbol: "sdBAL",
+      image: "https://cryptologos.cc/logos/balancer-bal-logo.png",
+      address: "0xF24d8651578a55b0C119B9910759a351A3458895",
+      amount: 168.46 - 143.843,
       decimals: 18,
     }
   ];
 
-  const fraxBribes = [];
-
-  const angleBribes = [
+  const fraxBribes = [
     {
-      gaugeName: "sanFRAX/EUR",
+      gaugeName: "Fraxswap V2 FRAX/IQ",
       token: "SDT",
       symbol: "SDT",
       image: "https://assets.coingecko.com/coins/images/13724/small/stakedao_logo.jpg?1611195011",
       address: SDT_ADDRESS,
-      amount: 1560.77 + 1553.23 - 2282.007,
+      amount: 305.71 + 260.86 - 424.062,
       decimals: 18,
     },
     {
-      gaugeName: "G-Uni agEUR/USDC LP",
+      gaugeName: "Vesper Orbit FRAX",
       token: "SDT",
       symbol: "SDT",
       image: "https://assets.coingecko.com/coins/images/13724/small/stakedao_logo.jpg?1611195011",
       address: SDT_ADDRESS,
-      amount: 3419.59 + 3403.07 - 3069.744,
+      amount: 457.39 + 455.17 - 389.280,
+      decimals: 18,
+    }
+  ];
+
+  const angleBribes = [
+    {
+      gaugeName: "Uni-V3 agEUR/USDC LP",
+      token: "SDT",
+      symbol: "SDT",
+      image: "https://assets.coingecko.com/coins/images/13724/small/stakedao_logo.jpg?1611195011",
+      address: SDT_ADDRESS,
+      amount: 5014.95 + 2507.48 + 3094.18 + 4990.61 - 8430.673,
       decimals: 18,
     }
   ];
@@ -529,10 +549,10 @@ const main = async () => {
   const bribes = crvBribes.concat(balBribes).concat(fraxBribes).concat(angleBribes);
 
   // Delegations
-  const crvDelegationRewards = 134320.670 + 126704.116;
-  const balDelegationRewards = 15015.18
-  const fraxDelegationRewards = 0;
-  const angleDelegationRewards = 3069.744 + 2282.007;
+  const crvDelegationRewards = 76051.282 + 134381.012 + 57356.609;
+  const balDelegationRewards = 143.843 + 196.07;
+  const fraxDelegationRewards = 424.062 + 389.280;
+  const angleDelegationRewards = 8430.673;
 
   // OTC
   const crvOtcDelegation = [];
@@ -545,7 +565,7 @@ const main = async () => {
 
   const crvMapBribeRewards = await bribesRun(crvIdProposal, "sdcrv.eth", crvBribes, crvDelegationRewards, crvOtcDelegation);
   const balMapBribeRewards = await bribesRun(balIdProposal, "sdbal.eth", balBribes, balDelegationRewards, balOtcDelegation);
-  //const fraxMapBribeRewards = await bribesRun(fraxIdProposal, "sdfxs.eth", fraxBribes, fraxDelegationRewards, fraxOtcDelegation);
+  const fraxMapBribeRewards = await bribesRun(fraxIdProposal, "sdfxs.eth", fraxBribes, fraxDelegationRewards, fraxOtcDelegation);
   const angleMapBribeRewards = await bribesRun(angleIdProposal, "sdangle.eth", angleBribes, angleDelegationRewards, angleOtcDelegation);
 
   // Compute all bribes rewards from protocols
@@ -557,13 +577,13 @@ const main = async () => {
       mapBribeRewards[key] = mapBribeRewards[key].concat(balMapBribeRewards[key]);
     }
   }
-  /*for (const key of Object.keys(fraxMapBribeRewards)) {
+  for (const key of Object.keys(fraxMapBribeRewards)) {
     if (!mapBribeRewards[key]) {
       mapBribeRewards[key] = fraxMapBribeRewards[key];
     } else {
       mapBribeRewards[key] = mapBribeRewards[key].concat(fraxMapBribeRewards[key]);
     }
-  }*/
+  }
   for (const key of Object.keys(angleMapBribeRewards)) {
     if (!mapBribeRewards[key]) {
       mapBribeRewards[key] = angleMapBribeRewards[key];
@@ -612,30 +632,39 @@ const main = async () => {
 
 
   // Now, we add them in the new distribution
-  
   for (const gaugeName of Object.keys(mapBribeRewards)) {
-    // Get token address
-    let tokenAddress = null;
-
-    // SDT or extra reward for delegation users
-    if (gaugeName.startsWith(DELEGATION_PREFIX)) {
-      const indexOfArrobase = gaugeName.indexOf(DELEGATION_EXTRA_REWARD_PREFIX);
-      if (indexOfArrobase > -1) {
-        tokenAddress = gaugeName.substring(indexOfArrobase + 1, gaugeName.length);
-      } else {
-        tokenAddress = SDT_ADDRESS;
-      }
-    } else {
-      tokenAddress = bribes.find(b => b.gaugeName === gaugeName).address;
-    }
-
-    // Check if we have a previous distribution to do for this token address
-    if (!usersWhoNeedClaim[tokenAddress]) {
-      usersWhoNeedClaim[tokenAddress] = [];
-    }
 
     // Increment or add the reward user in the map
     for (const r of mapBribeRewards[gaugeName]) {
+
+      // Get token address
+      let tokenAddress = null;
+
+      // SDT or extra reward for delegation users
+      if (gaugeName.startsWith(DELEGATION_PREFIX)) {
+        // OTC
+        const indexOfArrobase = gaugeName.indexOf(DELEGATION_EXTRA_REWARD_PREFIX);
+        if (indexOfArrobase > -1) {
+          tokenAddress = gaugeName.substring(indexOfArrobase + 1, gaugeName.length);
+        }
+      } else {
+        tokenAddress = bribes.find(b => b.gaugeName === gaugeName).address;
+      }
+
+      if (gaugeName.startsWith(DELEGATION_PREFIX) && tokenAddress === null) {
+        
+        tokenAddress = r.tokenAddress;
+      }
+
+      if (tokenAddress === null) {
+        throw new Error("tokenAddress null");
+      }
+
+      // Check if we have a previous distribution to do for this token address
+      if (!usersWhoNeedClaim[tokenAddress]) {
+        usersWhoNeedClaim[tokenAddress] = [];
+      }
+
       let find = false;
       for (const u of usersWhoNeedClaim[tokenAddress]) {
         if (u.account.toLowerCase() === r.voter.toLowerCase()) {
@@ -668,6 +697,7 @@ const main = async () => {
   // Increment the index [0, ...] for each tokens
   const global = [];
   const localGlobal = [];
+  fs.writeFileSync(`tmp/tot.json`, JSON.stringify(usersWhoNeedClaim));
   for (const tokenAddress of Object.keys(usersWhoNeedClaim)) {
     let bribe = bribes.find(b => b.address === tokenAddress);
     if (!bribe) {
@@ -678,6 +708,10 @@ const main = async () => {
     if (!bribe) {
       // Maybe an OTC deal
       bribe = crvOtcDelegation.find((o) => o.address === tokenAddress);
+    }
+
+    if(!bribe) {
+      throw new Error("bribe null");
     }
 
     const usersEligible = usersWhoNeedClaim[tokenAddress];
