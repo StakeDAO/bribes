@@ -11,13 +11,14 @@ const lastMerkle = require("./lastMerkle.json");
 const { parseUnits } = require("ethers/lib/utils");
 
 const SDT_ADDRESS = "0x73968b9a57c6E53d41345FD57a6E6ae27d6CDB2F";
+const SD_CRV = "0xD1b5651E55D4CeeD36251c61c50C889B36F6abB5";
 const SDBAL = "0xF24d8651578a55b0C119B9910759a351A3458895";
 
 const DELEGATION_PREFIX = "delegation-";
 const DELEGATION_EXTRA_REWARD_PREFIX = "@";
 const ENDPOINT = "https://hub.snapshot.org/graphql";
 const ENDPOINT_DELEGATORS = "https://api.thegraph.com/subgraphs/name/snapshot-labs/snapshot";
-const ENDPOINT_CLAIM_BRIBES = "https://api.thegraph.com/subgraphs/name/pierremarsotlyon1/bribesclaimv2";
+const ENDPOINT_CLAIM_BRIBES = "https://api.thegraph.com/subgraphs/name/pierremarsotlyon1/bribesclaimv3";
 const DELEGATION_ADDRESS = "0x52ea58f4FC3CEd48fa18E909226c1f8A0EF887DC";
 
 const QUERY_VOTES = gql`
@@ -441,128 +442,165 @@ const bribesRun = async (idProposal, space, bribes, delegationRewards, otcDelega
 const main = async () => {
 
   /*********** Inputs ********/
-  const crvIdProposal = "0xa2865d71439ba1a541674acc136f8f94d5882cc0e974339e6c047ab2fa6fcaa1";
-  const balIdProposal = "0x073feab368c5505a371032874d0cc805aebdfe4de774436274b47542657a75e6";
-  const fraxIdProposal = "0xc22c636b5e1ee133e59f8a6673795c47525a7acbf5a43791d1e5d6c7c16a42b9";
-  const angleIdProposal = "0x3c2c0771c3a4faaa0f798400bf5eacee0797995ca0532748d1907d5216c4c9c7";
+  const crvIdProposal = "0x6f1cd2f826ed05860b7860ce47761a88bf9021d6ecb6edd981e814c066652927";
+  const balIdProposal = "0x5203ad7f0152795810deed2863449ca6ea8ad4119e7065b6cb4f463176b7dc13";
+  const fraxIdProposal = "0x3fc760603f52996a41f8af9c52e8915aeb226cf6b3c07e4b086c56c35acbea57";
+  const angleIdProposal = "0xfc268eca2bd14604bfee6358098c7c3f399394d1d177b030d361dc098b7c7623";
 
   const crvBribes = [
     {
-      gaugeName: "DOLA+FRAXBP (0xE571…884d)",
-      token: "SDT",
-      symbol: "SDT",
-      image: "https://assets.coingecko.com/coins/images/13724/small/stakedao_logo.jpg?1611195011",
-      address: SDT_ADDRESS,
-      amount: 33990.59 + 36009.49 - 58926.400,
-      decimals: 18,
-    },
-    {
       gaugeName: "USDT+WBTC+WETH (0xD51a…AE46)",
-      token: "SDT",
-      symbol: "SDT",
-      image: "https://assets.coingecko.com/coins/images/13724/small/stakedao_logo.jpg?1611195011",
-      address: SDT_ADDRESS,
-      amount: 64263.19 + 64436.79 - 109283.244,
+      token: "sdCRV",
+      symbol: "sdCRV",
+      image: "https://etherscan.io/token/images/Curvefi_32.png",
+      address: SD_CRV,
+      amount: 36318.48 + 33.36 + 39352.84 + 167.61 - 62466.323,
       decimals: 18,
     },
     {
       gaugeName: "WETH+CRV (0x8301…C511)",
-      token: "SDT",
-      symbol: "SDT",
-      image: "https://assets.coingecko.com/coins/images/13724/small/stakedao_logo.jpg?1611195011",
-      address: SDT_ADDRESS,
-      amount: 26719.27 + 23438.00 - 30121.612,
+      token: "sdCRV",
+      symbol: "sdCRV",
+      image: "https://etherscan.io/token/images/Curvefi_32.png",
+      address: SD_CRV,
+      amount: 13226.83 + 4743.14 + 423.67 + 233.87 + 14146.04 - 17151.935,
       decimals: 18,
     },
     {
-      gaugeName: "polygon-am3CRV+amWBTC+amWETH (0x9221…22cC)",
-      token: "SDT",
-      symbol: "SDT",
-      image: "https://assets.coingecko.com/coins/images/13724/small/stakedao_logo.jpg?1611195011",
-      address: SDT_ADDRESS,
-      amount: 4389.96 + 5201.92 - 9591.875,
+      gaugeName: "xdai-WXDAI+USDC+USDT (0x7f90…F353)",
+      token: "sdCRV",
+      symbol: "sdCRV",
+      image: "https://etherscan.io/token/images/Curvefi_32.png",
+      address: SD_CRV,
+      amount: 2287.45 + 4026.54 - 6313.992,
+      decimals: 18,
+    },
+    {
+      gaugeName: "TRYB+3Crv (0x51Bc…86f8)",
+      token: "sdCRV",
+      symbol: "sdCRV",
+      image: "https://etherscan.io/token/images/Curvefi_32.png",
+      address: SD_CRV,
+      amount: 1104.93 + 1169.72 - 2274.654,
+      decimals: 18,
+    },
+    {
+      gaugeName: "DAI+USDC+USDT+sUSD (0xA540…fBfD)",
+      token: "sdCRV",
+      symbol: "sdCRV",
+      image: "https://etherscan.io/token/images/Curvefi_32.png",
+      address: SD_CRV,
+      amount: 883.51 + 5107.84,
+      decimals: 18,
+    },
+    {
+      gaugeName: "ETH+sETH (0xc542…4567)",
+      token: "sdCRV",
+      symbol: "sdCRV",
+      image: "https://etherscan.io/token/images/Curvefi_32.png",
+      address: SD_CRV,
+      amount: 1205.21 + 3907.19,
+      decimals: 18,
+    },
+    {
+      gaugeName: "polygon-CRV+crvUSDBTCETH (0xc7c9…8Fa7)",
+      token: "sdCRV",
+      symbol: "sdCRV",
+      image: "https://etherscan.io/token/images/Curvefi_32.png",
+      address: SD_CRV,
+      amount: 5856.95 - 5856.954,
       decimals: 18,
     }
   ]
 
   const balBribes = [
     {
-      gaugeName: "50Silo-50WETH",
-      token: "sdBAL",
-      symbol: "sdBAL",
-      image: "https://cryptologos.cc/logos/balancer-bal-logo.png",
-      address: SDBAL,
-      amount: 47.20 + 5.65 - 52.85,
-      decimals: 18,
-    },
-    {
       gaugeName: "B-sdBAL-STABLE",
       token: "sdBAL",
       symbol: "sdBAL",
       image: "https://cryptologos.cc/logos/balancer-bal-logo.png",
       address: SDBAL,
-      amount: 64.83 + 57.63,
+      amount: 61.22 + 51.88,
       decimals: 18,
     },
     {
-      gaugeName: "B-stETH-STABLE - 0xcD4722B7c24C29e…aE",
+      gaugeName: "B-wstETH-WETH-Stable",
       token: "sdBAL",
       symbol: "sdBAL",
       image: "https://cryptologos.cc/logos/balancer-bal-logo.png",
       address: SDBAL,
-      amount: 67.65,
+      amount: 189.16 - 189.16,
       decimals: 18,
     },
     {
-      gaugeName: "B-stETH-STABLE - 0xcD4722B7c24C29e…aE",
+      gaugeName: "20WBTC-80BADGER",
       token: "sdBAL",
       symbol: "sdBAL",
       image: "https://cryptologos.cc/logos/balancer-bal-logo.png",
       address: SDBAL,
-      amount: 67.65 - 67.65,
-      decimals: 18,
-    },
-    {
-      gaugeName: "50STG-50bb-a-USD",
-      token: "sdBAL",
-      symbol: "sdBAL",
-      image: "https://cryptologos.cc/logos/balancer-bal-logo.png",
-      address: SDBAL,
-      amount: 287.93 - 115.17 - 172.76,
+      amount: 290.92 - 290.92,
       decimals: 18,
     }
   ];
 
   const fraxBribes = [
     {
-      gaugeName: "Fraxswap V2 FRAX/OHM",
-      token: "SDT",
-      symbol: "SDT",
-      image: "https://assets.coingecko.com/coins/images/13724/small/stakedao_logo.jpg?1611195011",
-      address: SDT_ADDRESS,
-      amount: 49.41 + 96.56 - 145.97,
-      decimals: 18,
-    },
-    {
       gaugeName: "Fraxswap V2 FRAX/IQ",
       token: "SDT",
       symbol: "SDT",
       image: "https://assets.coingecko.com/coins/images/13724/small/stakedao_logo.jpg?1611195011",
       address: SDT_ADDRESS,
-      amount: 371.24 + 349.57 - 395.04,
+      amount: 510.50 + 1323.69 - 660.295,
+      decimals: 18,
+    },
+    {
+      gaugeName: "Vesper Orbit FRAX",
+      token: "SDT",
+      symbol: "SDT",
+      image: "https://assets.coingecko.com/coins/images/13724/small/stakedao_logo.jpg?1611195011",
+      address: SDT_ADDRESS,
+      amount: 416.00 + 413.96 - 829.956,
+      decimals: 18,
+    },
+    {
+      gaugeName: "Convex stkcvxSDTFRAXBP",
+      token: "SDT",
+      symbol: "SDT",
+      image: "https://assets.coingecko.com/coins/images/13724/small/stakedao_logo.jpg?1611195011",
+      address: SDT_ADDRESS,
+      amount: 1409.28 + 1402.37 - 2164.610,
       decimals: 18,
     }
   ];
 
-  const angleBribes = [];
+  const angleBribes = [
+    {
+      gaugeName: "Uni-V3 agEUR/ETH LP",
+      token: "SDT",
+      symbol: "SDT",
+      image: "https://assets.coingecko.com/coins/images/13724/small/stakedao_logo.jpg?1611195011",
+      address: SDT_ADDRESS,
+      amount: 1642.64 + 1768.41 - 2626.325,
+      decimals: 18,
+    },
+    {
+      gaugeName: "Uni-V3 agEUR/USDC LP",
+      token: "SDT",
+      symbol: "SDT",
+      image: "https://assets.coingecko.com/coins/images/13724/small/stakedao_logo.jpg?1611195011",
+      address: SDT_ADDRESS,
+      amount: 614.26,
+      decimals: 18,
+    }
+  ];
 
   const bribes = crvBribes.concat(balBribes).concat(fraxBribes).concat(angleBribes);
 
   // Delegations
-  const crvDelegationRewards = 58926.400 + 9591.875 + 109283.244 + 30121.612;
-  const balDelegationRewards = 52.85 + 115.172 + 67.65 + 172.76;
-  const fraxDelegationRewards = 145.972 + 395.04;
-  const angleDelegationRewards = 0;
+  const crvDelegationRewards = 5856.954 + 2274.654 + 6313.992 + 17151.935 + 62466.323;
+  const balDelegationRewards = 189.16 + 290.92;
+  const fraxDelegationRewards = 2164.610 + 829.956 + 660.295;
+  const angleDelegationRewards = 2626.325;
 
   // OTC
   const crvOtcDelegation = [];
