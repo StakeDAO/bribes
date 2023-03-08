@@ -456,7 +456,7 @@ const main = async () => {
       symbol: "sdCRV",
       image: "https://etherscan.io/token/images/Curvefi_32.png",
       address: SD_CRV,
-      amount: 26944.24 + 24404.17 - 33898.570,
+      amount: 0,
       decimals: 18,
     },
     {
@@ -465,7 +465,7 @@ const main = async () => {
       symbol: "sdCRV",
       image: "https://etherscan.io/token/images/Curvefi_32.png",
       address: SD_CRV,
-      amount: 12540.48 - 12540.476,
+      amount: 0,
       decimals: 18,
     },
     {
@@ -474,7 +474,7 @@ const main = async () => {
       symbol: "sdCRV",
       image: "https://etherscan.io/token/images/Curvefi_32.png",
       address: SD_CRV,
-      amount: 4816.80 - 4816.796,
+      amount: 0,
       decimals: 18,
     },
     {
@@ -483,7 +483,7 @@ const main = async () => {
       symbol: "sdCRV",
       image: "https://etherscan.io/token/images/Curvefi_32.png",
       address: SD_CRV,
-      amount: 3239.37 - 3239.365,
+      amount: 0,
       decimals: 18,
     },
     {
@@ -492,7 +492,7 @@ const main = async () => {
       symbol: "sdCRV",
       image: "https://etherscan.io/token/images/Curvefi_32.png",
       address: SD_CRV,
-      amount: 10610.79 + 10981.95 - 11840.554,
+      amount: 0,
       decimals: 18,
     },
     {
@@ -501,7 +501,7 @@ const main = async () => {
       symbol: "sdCRV",
       image: "https://etherscan.io/token/images/Curvefi_32.png",
       address: SD_CRV,
-      amount: 10028.81 + 10917.97 - 17804.443,
+      amount: 0,
       decimals: 18,
     },
     {
@@ -510,7 +510,7 @@ const main = async () => {
       symbol: "sdCRV",
       image: "https://etherscan.io/token/images/Curvefi_32.png",
       address: SD_CRV,
-      amount: 17493.30 + 17531.13 - 31874.149,
+      amount: 0,
       decimals: 18,
     }
   ]
@@ -522,7 +522,7 @@ const main = async () => {
       symbol: "sdBAL",
       image: "https://cryptologos.cc/logos/balancer-bal-logo.png",
       address: SDBAL,
-      amount: 57.08 + 52.39 - 109.468,
+      amount: 0,
       decimals: 18,
     },
     {
@@ -531,7 +531,7 @@ const main = async () => {
       symbol: "sdBAL",
       image: "https://cryptologos.cc/logos/balancer-bal-logo.png",
       address: SDBAL,
-      amount: 36.73 + 38.61,
+      amount: 0,
       decimals: 18,
     },
     {
@@ -540,7 +540,7 @@ const main = async () => {
       symbol: "sdBAL",
       image: "https://cryptologos.cc/logos/balancer-bal-logo.png",
       address: SDBAL,
-      amount: 76.17 - 76.17,
+      amount: 0,
       decimals: 18,
     },
     // HH Gauges, gauge which have 0 vote
@@ -550,7 +550,7 @@ const main = async () => {
       symbol: "sdBAL",
       image: "https://cryptologos.cc/logos/balancer-bal-logo.png",
       address: SDBAL,
-      amount: 445.93 - 314.807 - 125.923,
+      amount: 0,
       decimals: 18,
     }
   ];
@@ -562,7 +562,7 @@ const main = async () => {
       symbol: "SDT",
       image: "https://assets.coingecko.com/coins/images/13724/small/stakedao_logo.jpg?1611195011",
       address: SDT_ADDRESS,
-      amount: 1173.94 + 1609.98 - 1637.102,
+      amount: 0,
       decimals: 18,
     },
     {
@@ -571,7 +571,7 @@ const main = async () => {
       symbol: "SDT",
       image: "https://assets.coingecko.com/coins/images/13724/small/stakedao_logo.jpg?1611195011",
       address: SDT_ADDRESS,
-      amount: 2500.77 + 2488.27 - 3260.680,
+      amount: 0,
       decimals: 18,
     }
   ];
@@ -583,7 +583,7 @@ const main = async () => {
       symbol: "sdANGLE",
       image: "https://assets.coingecko.com/coins/images/19060/small/ANGLE_Token-light.png?1666774221",
       address: SDANGLE,
-      amount: 8592.27 + 11300.40 - 12998.541,
+      amount: 0,
       decimals: 18,
     },
     {
@@ -592,7 +592,7 @@ const main = async () => {
       symbol: "sdANGLE",
       image: "https://assets.coingecko.com/coins/images/19060/small/ANGLE_Token-light.png?1666774221",
       address: SDANGLE,
-      amount: 4902.65 + 4682.92 + 5697.38 + 5697.38 - 14240.520,
+      amount: 0,
       decimals: 18,
     }
   ];
@@ -600,10 +600,10 @@ const main = async () => {
   const bribes = crvBribes.concat(balBribes).concat(fraxBribes).concat(angleBribes);
 
   // Delegations
-  const crvDelegationRewards = 3239.365 + 33898.570 + 12540.476 + 4816.796 + 11840.554 + 31874.149 + 17804.443;
-  const balDelegationRewards = 76.17 + 109.468 + 314.807 + 125.923;
-  const fraxDelegationRewards = 1637.102 + 3260.680;
-  const angleDelegationRewards = 14240.520 + 12998.541;
+  const crvDelegationRewards = 0;
+  const balDelegationRewards = 0;
+  const fraxDelegationRewards = 0;
+  const angleDelegationRewards = 0;
 
   // OTC
   const crvOtcDelegation = [];
@@ -681,7 +681,6 @@ const main = async () => {
     }
   }
 
-
   // Now, we add them in the new distribution
   for (const gaugeName of Object.keys(mapBribeRewards)) {
 
@@ -703,7 +702,6 @@ const main = async () => {
       }
 
       if (gaugeName.startsWith(DELEGATION_PREFIX) && tokenAddress === null) {
-        
         tokenAddress = r.tokenAddress;
       }
 
@@ -718,14 +716,14 @@ const main = async () => {
 
       let find = false;
       for (const u of usersWhoNeedClaim[tokenAddress]) {
-        if (u.account.toLowerCase() === r.voter.toLowerCase()) {
+        if (u.account.toLowerCase() === r.voter.toLowerCase() && BigNumber.from(r.amount).gt(0)) {
           find = true;
           u.amount = BigNumber.from(u.amount).add(BigNumber.from(r.amount));
           break;
         }
       }
 
-      if (!find) {
+      if (!find && BigNumber.from(r.amount).gt(0)) {
           usersWhoNeedClaim[tokenAddress].push({
             amount: BigNumber.from(r.amount),
             account: r.voter.toLowerCase(),
