@@ -451,9 +451,9 @@ const bribesRun = async (idProposal, space, bribes, delegationRewards, otcDelega
 const main = async () => {
 
   /*********** Inputs ********/
-  const crvIdProposal = "0x0fff64ac56e024c3f37d22c0902ab1155d6f6a46636c7715c6ba85d00ec22a78";
-  const balIdProposal = "0xee1c033580f666f0d01c888a531492d1fa8f23134e569a8653f245713d348d19";
-  const fraxIdProposal = "0x08c88e151d3cf13163e9279328c68fc973529787afc65020cb6d021ca6f5aed9";
+  const crvIdProposal = "0x5bed96d02e2ca179d57c20daf796a84149ad6c22d1e240f773e6dcf10b14d2bb";
+  const balIdProposal = "0x538b3a8e3ac7a7baf25867559997b526a324bed4dae029cec9eab23827c1a236";
+  const fraxIdProposal = "0x567d2a6f706647b1321f79a0723549323f02d038e4de47bbcde547cf9781f2b8";
   const angleIdProposal = "0xc7a8b490ca483cf69f74d4c13e09ea2cd9e704e8c1949de0384f5d4209b814cb";
 
   const crvBribes = [
@@ -463,7 +463,7 @@ const main = async () => {
       symbol: "SDT",
       image: SDT_IMAGE,
       address: SDT_ADDRESS,
-      amount: 98266.73 + 96767.39 - 166820.423,
+      amount: 84509 + 89304.93 - 152317.29,
       decimals: 18,
     },
     {
@@ -472,7 +472,7 @@ const main = async () => {
       symbol: "SDT",
       image: SDT_IMAGE,
       address: SDT_ADDRESS,
-      amount: 77820.14 + 77409.71 - 126835.619,
+      amount: 62666.83 + 68765.19 - 109379.45,
       decimals: 18,
     },
     {
@@ -481,7 +481,43 @@ const main = async () => {
       symbol: "SDT",
       image: SDT_IMAGE,
       address: SDT_ADDRESS,
-      amount: 10296.53 + 10246.55 - 15565.191,
+      amount: 8463.44 + 9860.70 - 13784.74,
+      decimals: 18,
+    },
+    {
+      gaugeName: "OHM+FRAXBP (0xFc1e…E48D)",
+      token: "SDT",
+      symbol: "SDT",
+      image: SDT_IMAGE,
+      address: SDT_ADDRESS,
+      amount: 1866.68 + 49.43 + 1864.33 + 49.43 - 3829.87,
+      decimals: 18,
+    },
+    {
+      gaugeName: "ETH+msETH (0xc897…0025)",
+      token: "SDT",
+      symbol: "SDT",
+      image: SDT_IMAGE,
+      address: SDT_ADDRESS,
+      amount: 1198.16 + 1191.10,
+      decimals: 18,
+    },
+    {
+      gaugeName: "ETH+sETH (0xc542…4567)",
+      token: "SDT",
+      symbol: "SDT",
+      image: SDT_IMAGE,
+      address: SDT_ADDRESS,
+      amount: 3297.88 + 3740.43 - 7038.31,
+      decimals: 18,
+    },
+    {
+      gaugeName: "DAI+USDC+USDT+sUSD (0xA540…fBfD)",
+      token: "SDT",
+      symbol: "SDT",
+      image: SDT_IMAGE,
+      address: SDT_ADDRESS,
+      amount: 7532.64 + 7873.96 - 7079.95,
       decimals: 18,
     },
     {
@@ -490,61 +526,25 @@ const main = async () => {
       symbol: "SDT",
       image: SDT_IMAGE,
       address: SDT_ADDRESS,
-      amount: 6252.44 + 9144.73 - 9464.548,
+      amount: 3420.29 + 4077.04 - 3445.32,
       decimals: 18,
     },
     {
-      gaugeName: "TRYB+3Crv (0x51Bc…86f8)",
+      gaugeName: "ETH+rETH (0xF944…e7A8)",
       token: "SDT",
       symbol: "SDT",
       image: SDT_IMAGE,
       address: SDT_ADDRESS,
-      amount: 1416.28,
+      amount: 1993.80 + 2000.86,
       decimals: 18,
     },
     {
-      gaugeName: "ALCX+FRAXBP (0x4149…9D31)",
+      gaugeName: "multiBTC+sbtc2Crv (0x2863…e353)",
       token: "SDT",
       symbol: "SDT",
       image: SDT_IMAGE,
       address: SDT_ADDRESS,
-      amount: 172.25 + 2601.52,
-      decimals: 18,
-    },
-    {
-      gaugeName: "GUSD+FRAXBP (0x4e43…8D93)",
-      token: "SDT",
-      symbol: "SDT",
-      image: SDT_IMAGE,
-      address: SDT_ADDRESS,
-      amount: 193.14 + 3240.86 - 3434.003,
-      decimals: 18,
-    },
-    {
-      gaugeName: "SDT+FRAXBP (0x3e3C…D0Ae)",
-      token: "SDT",
-      symbol: "SDT",
-      image: SDT_IMAGE,
-      address: SDT_ADDRESS,
-      amount: 62.28 + 1027.68,
-      decimals: 18,
-    },
-    {
-      gaugeName: "eUSD+FRAXBP (0xAEda…4D4F)",
-      token: "SDT",
-      symbol: "SDT",
-      image: SDT_IMAGE,
-      address: SDT_ADDRESS,
-      amount: 45.25 + 745.33,
-      decimals: 18,
-    },
-    {
-      gaugeName: "UZD+FRAXBP (0x6893…de3a)",
-      token: "SDT",
-      symbol: "SDT",
-      image: SDT_IMAGE,
-      address: SDT_ADDRESS,
-      amount: 20.63 + 1128.36 + 971.36 + 36.25 - 772.717,
+      amount: 6230.91 + 7188.96 - 13419.87,
       decimals: 18,
     }
   ]
@@ -556,7 +556,7 @@ const main = async () => {
       symbol: "sdBAL",
       image: "https://cryptologos.cc/logos/balancer-bal-logo.png",
       address: SDBAL,
-      amount: 81.62 + 80.02 - 69.615,
+      amount: 149.53 + 149.53 - 122.50,
       decimals: 18,
     },
     {
@@ -565,7 +565,7 @@ const main = async () => {
       symbol: "sdBAL",
       image: "https://cryptologos.cc/logos/balancer-bal-logo.png",
       address: SDBAL,
-      amount: 140.75 + 137.99 - 278.74,
+      amount: 121.15 + 121.15 - 242.29,
       decimals: 18,
     },
     {
@@ -574,16 +574,16 @@ const main = async () => {
       symbol: "sdBAL",
       image: "https://cryptologos.cc/logos/balancer-bal-logo.png",
       address: SDBAL,
-      amount: 45.83 + 55.19,
+      amount: 53.54 + 53.54,
       decimals: 18,
     },
     {
-      gaugeName: "USDC-PAL",
+      gaugeName: "B-stETH-STABLE",
       token: "sdBAL",
       symbol: "sdBAL",
       image: "https://cryptologos.cc/logos/balancer-bal-logo.png",
       address: SDBAL,
-      amount: 56.49 - 56.49,
+      amount: 10.20 + 10.20 - 4.75,
       decimals: 18,
     },
     
@@ -599,7 +599,7 @@ const main = async () => {
       decimals: 18,
     },*/
     // HH Gauges, gauge which have 0 vote
-    {
+    /*{
       gaugeName: "wstETH-rETH-sfrxETH-BPT",
       token: "sdBAL",
       symbol: "sdBAL",
@@ -607,28 +607,29 @@ const main = async () => {
       address: SDBAL,
       amount: 0,
       decimals: 18,
-    }
+    }*/
   ];
 
   const fraxBribes = [
-    {
-      gaugeName: "Convex stkcvxSDTFRAXBP",
-      token: "sdFXS",
-      symbol: "sdFXS",
-      image: "https://assets.coingecko.com/coins/images/13423/small/Frax_Shares_icon.png?1679886947",
-      address: SDFXS,
-      amount: 58.11 + 56.09 - 51.543,
-      decimals: 18,
-    },
     {
       gaugeName: "Temple FRAX/TEMPLE",
       token: "sdFXS",
       symbol: "sdFXS",
       image: "https://assets.coingecko.com/coins/images/13423/small/Frax_Shares_icon.png?1679886947",
       address: SDFXS,
-      amount: 127.01 + 146.46 - 158.339,
+      amount: 102.38 + 102.38 - 204.76,
       decimals: 18,
     },
+    {
+      gaugeName: "Convex stkcvxSDTFRAXBP",
+      token: "sdFXS",
+      symbol: "sdFXS",
+      image: "https://assets.coingecko.com/coins/images/13423/small/Frax_Shares_icon.png?1679886947",
+      address: SDFXS,
+      amount: 110.00 + 62.62 + 110.00 + 62.62 - 123.73,
+      decimals: 18,
+    },
+    
     
   ];
 
@@ -637,9 +638,9 @@ const main = async () => {
   const bribes = crvBribes.concat(balBribes).concat(fraxBribes).concat(angleBribes);
 
   // Delegations
-  const crvDelegationRewards = 3434.003 + 15565.191 + 166820.423 + 772.717 + 126835.619 + 9464.548;
-  const balDelegationRewards = 69.615 + 278.74 + 56.49 + 28.869 + 28.869;
-  const fraxDelegationRewards = 51.543 + 158.339;
+  const crvDelegationRewards = 7079.95 + 7038.31 + 13419.87 + 13784.74 + 3829.87 + 152317.29 + 109379.45 + 3445.32;
+  const balDelegationRewards = 122.50 + 242.29 + 4.75 + 24.423 + 73.269;
+  const fraxDelegationRewards = 123.73 + 204.76;
   const angleDelegationRewards = 0;
 
   // OTC
@@ -650,7 +651,7 @@ const main = async () => {
 
   // sdBAL extra rewards
   const extraRewardsPerAddress = {
-    "0xb0e83C2D71A991017e0116d58c5765Abc57384af": 19.079 + 38.158 + 19.079,
+    "0xb0e83C2D71A991017e0116d58c5765Abc57384af": 80.457,
   };
 
   const crvMapBribeRewards = await bribesRun(crvIdProposal, "sdcrv.eth", crvBribes, crvDelegationRewards, crvOtcDelegation);
