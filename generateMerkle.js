@@ -5,6 +5,7 @@ const orderBy = require("lodash/orderBy");
 const { gql, request } = require("graphql-request");
 const axios = require('axios').default;
 const { ethers, utils, BigNumber } = require("ethers");
+const moment = require("moment");
 
 // LAST MERKLE
 const lastMerkle = require("./lastMerkle.json");
@@ -23,6 +24,9 @@ const ENDPOINT_DELEGATORS = "https://api.thegraph.com/subgraphs/name/snapshot-la
 const ENDPOINT_CLAIM_BRIBES = "https://api.thegraph.com/subgraphs/name/pierremarsotlyon1/bribesclaimv3";
 const DELEGATION_ADDRESS = "0x52ea58f4FC3CEd48fa18E909226c1f8A0EF887DC";
 const SDT_IMAGE = "https://assets.coingecko.com/coins/images/13724/small/stakedao_logo.jpg?1611195011";
+
+const AGNOSTIC_ENDPOINT = "https://proxy.eu-02.agnostic.engineering/query";
+const AGNOSTIC_API_KEY = "Fr2LXSVvKCfmXse8JQJiJBLHY9ujU3YZf8Kr6TDDh4Sw";
 
 const QUERY_VOTES = gql`
 	query Proposal(
@@ -113,6 +117,60 @@ query Bribes {
 }
 `;
 
+
+const DATE_LAST_CLAIM_QUERY = `
+SELECT
+    timestamp
+FROM evm_events_ethereum_mainnet
+WHERE
+    address = '0x03E34b085C52985F6a5D27243F20C84bDdc01Db4' and
+    signature = 'Claimed(address,uint256,uint256,address,uint256)'
+ORDER BY timestamp DESC
+LIMIT 1
+`;
+
+const DATE_LAST_UPDATE_QUERY = (timestamp) => `
+SELECT
+    timestamp
+FROM evm_events_ethereum_mainnet
+WHERE
+    address = '0x03E34b085C52985F6a5D27243F20C84bDdc01Db4' and
+    timestamp < '${timestamp}' and
+    signature = 'MerkleRootUpdated(address,bytes32,uint256)'
+ORDER BY timestamp DESC
+LIMIT 1
+`;
+
+const ALL_CLAIMED_QUERY = (since, end) => `
+SELECT
+    input_3_value_address as user,
+    input_0_value_address as token
+FROM evm_events_ethereum_mainnet
+WHERE
+    address = '0x03E34b085C52985F6a5D27243F20C84bDdc01Db4' and
+    timestamp > '${since}' and
+    timestamp <= '${end}' and
+    signature = 'Claimed(address,uint256,uint256,address,uint256)'
+ORDER BY timestamp DESC
+`;
+
+const agnosticFetch = async (query) => {
+  try {
+      const response = await axios.post(AGNOSTIC_ENDPOINT, query, {
+          headers: {
+              'Authorization': `${AGNOSTIC_API_KEY}`,
+              "Cache-Control": "max-age=300"
+          }
+      });
+
+      return response.data.rows;
+  }
+  catch (e) {
+      console.error(e);
+      return [];
+  }
+}
+
 const getAllDelegators = async (timestamp, space) => {
   let delegatorAddresses = [];
   let run = true;
@@ -139,6 +197,30 @@ const getAllAccountClaimedSinceLastFreeze = async () => {
   const result = await request(ENDPOINT_CLAIM_BRIBES, CLAIM_BRIBES, null);
   return result.lastClaimeds;
 };
+
+const getAllAccountClaimedSinceLastFreezeWithAgnostic = async () => {
+  const lastClaim = await agnosticFetch(DATE_LAST_CLAIM_QUERY);
+  const lastUpdate = await agnosticFetch(DATE_LAST_UPDATE_QUERY(lastClaim[0][0]));
+
+  const lastClaimTimestamp = lastClaim[0][0];
+  const lastUpdateTimestamp = lastUpdate[0][0];
+  
+  // Get all claimed
+  const allClaimed = await agnosticFetch(ALL_CLAIMED_QUERY(lastUpdateTimestamp, lastClaimTimestamp));
+  
+  // Create map token => users
+  const resp = {};
+  for(const claim of allClaimed) {
+      const token = claim[1].toLowerCase();
+      if(!resp[token]) {
+          resp[token] = [];
+      }
+
+      resp[token].push(claim[0].toLowerCase());
+  }
+  
+  return resp;
+}
 
 /**
  * Get all votes for a proposal
@@ -438,12 +520,6 @@ const bribesRun = async (idProposal, space, bribes, delegationRewards, otcDelega
     }
   }
 
-  let total = 0;
-  for(const key of Object.keys(mapBribeRewards)) {
-    for(const u of mapBribeRewards[key]) {
-      total += parseFloat(u.amountNumber);
-    }
-  }
   fs.writeFileSync(`tmp/${space}-mapBribeRewards.json`, JSON.stringify(mapBribeRewards));
   return mapBribeRewards;
 };
@@ -451,55 +527,19 @@ const bribesRun = async (idProposal, space, bribes, delegationRewards, otcDelega
 const main = async () => {
 
   /*********** Inputs ********/
-  const crvIdProposal = "0x5bed96d02e2ca179d57c20daf796a84149ad6c22d1e240f773e6dcf10b14d2bb";
-  const balIdProposal = "0x538b3a8e3ac7a7baf25867559997b526a324bed4dae029cec9eab23827c1a236";
-  const fraxIdProposal = "0x567d2a6f706647b1321f79a0723549323f02d038e4de47bbcde547cf9781f2b8";
-  const angleIdProposal = "0xc7a8b490ca483cf69f74d4c13e09ea2cd9e704e8c1949de0384f5d4209b814cb";
+  const crvIdProposal = "0x165dfc1ebc20598d3af86d39b81db41036c28ff443ed929f2dcf2aa0a77140c5";
+  const balIdProposal = "0xbfe66f6b16fb66043e9d6462a901dd209108abfddc4b5e173abecfc52bb9b038";
+  const fraxIdProposal = "0xc6f43ca59d730cc1dbd04009f38d75c3e6d0e593830299a11a596be88b5b8ead";
+  const angleIdProposal = "0x4351f651cb2a6da32297ebdf56f503d2449b8afb3bff3ebb1c1b914f547fd12f";
 
   const crvBribes = [
-    {
-      gaugeName: "USDT+WBTC+WETH (0xD51a…AE46)",
-      token: "SDT",
-      symbol: "SDT",
-      image: SDT_IMAGE,
-      address: SDT_ADDRESS,
-      amount: 84509 + 89304.93 - 152317.29,
-      decimals: 18,
-    },
-    {
-      gaugeName: "WETH+CRV (0x8301…C511)",
-      token: "SDT",
-      symbol: "SDT",
-      image: SDT_IMAGE,
-      address: SDT_ADDRESS,
-      amount: 62666.83 + 68765.19 - 109379.45,
-      decimals: 18,
-    },
     {
       gaugeName: "OGV+ETH (0xB5ae…D58c)",
       token: "SDT",
       symbol: "SDT",
       image: SDT_IMAGE,
       address: SDT_ADDRESS,
-      amount: 8463.44 + 9860.70 - 13784.74,
-      decimals: 18,
-    },
-    {
-      gaugeName: "OHM+FRAXBP (0xFc1e…E48D)",
-      token: "SDT",
-      symbol: "SDT",
-      image: SDT_IMAGE,
-      address: SDT_ADDRESS,
-      amount: 1866.68 + 49.43 + 1864.33 + 49.43 - 3829.87,
-      decimals: 18,
-    },
-    {
-      gaugeName: "ETH+msETH (0xc897…0025)",
-      token: "SDT",
-      symbol: "SDT",
-      image: SDT_IMAGE,
-      address: SDT_ADDRESS,
-      amount: 1198.16 + 1191.10,
+      amount: 17318.97 - 17318.97,
       decimals: 18,
     },
     {
@@ -508,7 +548,7 @@ const main = async () => {
       symbol: "SDT",
       image: SDT_IMAGE,
       address: SDT_ADDRESS,
-      amount: 3297.88 + 3740.43 - 7038.31,
+      amount: 6369.27 + 7690.88 - 14060.15,
       decimals: 18,
     },
     {
@@ -517,16 +557,7 @@ const main = async () => {
       symbol: "SDT",
       image: SDT_IMAGE,
       address: SDT_ADDRESS,
-      amount: 7532.64 + 7873.96 - 7079.95,
-      decimals: 18,
-    },
-    {
-      gaugeName: "xdai-WXDAI+USDC+USDT (0x7f90…F353)",
-      token: "SDT",
-      symbol: "SDT",
-      image: SDT_IMAGE,
-      address: SDT_ADDRESS,
-      amount: 3420.29 + 4077.04 - 3445.32,
+      amount: 12634.56 + 12572.92 - 17151.32,
       decimals: 18,
     },
     {
@@ -535,57 +566,150 @@ const main = async () => {
       symbol: "SDT",
       image: SDT_IMAGE,
       address: SDT_ADDRESS,
-      amount: 1993.80 + 2000.86,
+      amount: 2837.19 + 2823.36,
       decimals: 18,
     },
     {
-      gaugeName: "multiBTC+sbtc2Crv (0x2863…e353)",
+      gaugeName: "COIL+FRAXBP (0xAF42…DF33)",
       token: "SDT",
       symbol: "SDT",
       image: SDT_IMAGE,
       address: SDT_ADDRESS,
-      amount: 6230.91 + 7188.96 - 13419.87,
+      amount: 51049.07 + 246.58 + 51077.92 + 324.27 - 26746.77,
+      decimals: 18,
+    },
+    {
+      gaugeName: "xdai-WXDAI+USDC+USDT (0x7f90…F353)",
+      token: "SDT",
+      symbol: "SDT",
+      image: SDT_IMAGE,
+      address: SDT_ADDRESS,
+      amount: 1970.30 + 4244.73,
+      decimals: 18,
+    },
+    {
+      gaugeName: "ETH+msETH (0xc897…0025)",
+      token: "SDT",
+      symbol: "SDT",
+      image: SDT_IMAGE,
+      address: SDT_ADDRESS,
+      amount: 871.90 + 917.57,
+      decimals: 18,
+    },
+    {
+      gaugeName: "OHM+FRAXBP (0xFc1e…E48D)",
+      token: "SDT",
+      symbol: "SDT",
+      image: SDT_IMAGE,
+      address: SDT_ADDRESS,
+      amount: 1889.39 + 1887.50,
+      decimals: 18,
+    },
+    {
+      gaugeName: "arbitrum-VST+FRAX (0x59bF…6Ba4)",
+      token: "SDT",
+      symbol: "SDT",
+      image: SDT_IMAGE,
+      address: SDT_ADDRESS,
+      amount: 2200.67 + 2199.16,
+      decimals: 18,
+    },
+    {
+      gaugeName: "arbitrum-FRAX+USDC (0xC9B8…40d5)",
+      token: "SDT",
+      symbol: "SDT",
+      image: SDT_IMAGE,
+      address: SDT_ADDRESS,
+      amount: 2209.93 + 2199.16,
+      decimals: 18,
+    },
+    {
+      gaugeName: "USDT+WBTC+WETH (0xD51a…AE46)",
+      token: "SDT",
+      symbol: "SDT",
+      image: SDT_IMAGE,
+      address: SDT_ADDRESS,
+      amount: 47595.31 + 48748.08 - 96343.38,
+      decimals: 18,
+    },
+    {
+      gaugeName: "WETH+CRV (0x8301…C511)",
+      token: "SDT",
+      symbol: "SDT",
+      image: SDT_IMAGE,
+      address: SDT_ADDRESS,
+      amount: 40524.45 + 42911.06 - 68331.50,
+      decimals: 18,
+    },
+    {
+      gaugeName: "polygon-CRV+crvUSDBTCETH (0xc7c9…8Fa7)",
+      token: "SDT",
+      symbol: "SDT",
+      image: SDT_IMAGE,
+      address: SDT_ADDRESS,
+      amount: 10481.96 + 10810.62 - 21292.57,
       decimals: 18,
     }
   ]
 
   const balBribes = [
     {
-      gaugeName: "50Silo-50WETH",
-      token: "sdBAL",
-      symbol: "sdBAL",
-      image: "https://cryptologos.cc/logos/balancer-bal-logo.png",
-      address: SDBAL,
-      amount: 149.53 + 149.53 - 122.50,
+      gaugeName: "50PENDLE-50WETH",
+      token: "SDT",
+      symbol: "SDT",
+      image: SDT_IMAGE,
+      address: SDT_ADDRESS,
+      amount: 2340.92 + 2295.74,
       decimals: 18,
     },
     {
-      gaugeName: "80D2D-20USDC",
-      token: "sdBAL",
-      symbol: "sdBAL",
-      image: "https://cryptologos.cc/logos/balancer-bal-logo.png",
-      address: SDBAL,
-      amount: 121.15 + 121.15 - 242.29,
+      gaugeName: "50INV-50DOLA",
+      token: "SDT",
+      symbol: "SDT",
+      image: SDT_IMAGE,
+      address: SDT_ADDRESS,
+      amount: 3400.18 + 3330.77 - 4029.66,
       decimals: 18,
     },
     {
-      gaugeName: "B-sdBAL-STABLE",
-      token: "sdBAL",
-      symbol: "sdBAL",
-      image: "https://cryptologos.cc/logos/balancer-bal-logo.png",
-      address: SDBAL,
-      amount: 53.54 + 53.54,
+      gaugeName: "50RBN-50USDC",
+      token: "SDT",
+      symbol: "SDT",
+      image: SDT_IMAGE,
+      address: SDT_ADDRESS,
+      amount: 1898.30 + 1859.56 - 1404.34,
       decimals: 18,
     },
     {
       gaugeName: "B-stETH-STABLE",
-      token: "sdBAL",
-      symbol: "sdBAL",
-      image: "https://cryptologos.cc/logos/balancer-bal-logo.png",
-      address: SDBAL,
-      amount: 10.20 + 10.20 - 4.75,
+      token: "SDT",
+      symbol: "SDT",
+      image: SDT_IMAGE,
+      address: SDT_ADDRESS,
+      amount: 338.71 + 1043.94 + 688.50 - 2071.15,
       decimals: 18,
     },
+    {
+      gaugeName: "80D2D-20USDC",
+      token: "SDT",
+      symbol: "SDT",
+      image: SDT_IMAGE,
+      address: SDT_ADDRESS,
+      amount: 4438.69 + 4348.52 - 8787.20,
+      decimals: 18,
+    },
+    {
+      gaugeName: "B-sdBAL-STABLE",
+      token: "SDT",
+      symbol: "SDT",
+      image: SDT_IMAGE,
+      address: SDT_ADDRESS,
+      amount: 1978.84 + 1939.54,
+      decimals: 18,
+    },
+    
+    
+    
     
 
     // YK
@@ -617,7 +741,7 @@ const main = async () => {
       symbol: "sdFXS",
       image: "https://assets.coingecko.com/coins/images/13423/small/Frax_Shares_icon.png?1679886947",
       address: SDFXS,
-      amount: 102.38 + 102.38 - 204.76,
+      amount: 222.79 + 221.71 - 332.70,
       decimals: 18,
     },
     {
@@ -626,7 +750,7 @@ const main = async () => {
       symbol: "sdFXS",
       image: "https://assets.coingecko.com/coins/images/13423/small/Frax_Shares_icon.png?1679886947",
       address: SDFXS,
-      amount: 110.00 + 62.62 + 110.00 + 62.62 - 123.73,
+      amount: 92.34 + 128.88 - 71.96,
       decimals: 18,
     },
     
@@ -638,9 +762,9 @@ const main = async () => {
   const bribes = crvBribes.concat(balBribes).concat(fraxBribes).concat(angleBribes);
 
   // Delegations
-  const crvDelegationRewards = 7079.95 + 7038.31 + 13419.87 + 13784.74 + 3829.87 + 152317.29 + 109379.45 + 3445.32;
-  const balDelegationRewards = 122.50 + 242.29 + 4.75 + 24.423 + 73.269;
-  const fraxDelegationRewards = 123.73 + 204.76;
+  const crvDelegationRewards = 96343.38 + 26746.77 + 17151.32 + 14060.15 + 17318.97 + 21292.57 + 68331.50;
+  const balDelegationRewards = 4029.66 + 1404.34 + 8787.20 + 2071.15;
+  const fraxDelegationRewards = 71.96 + 332.70;
   const angleDelegationRewards = 0;
 
   // OTC
@@ -651,7 +775,7 @@ const main = async () => {
 
   // sdBAL extra rewards
   const extraRewardsPerAddress = {
-    "0xb0e83C2D71A991017e0116d58c5765Abc57384af": 80.457,
+    //"0xb0e83C2D71A991017e0116d58c5765Abc57384af": 80.457,
   };
 
   const crvMapBribeRewards = await bribesRun(crvIdProposal, "sdcrv.eth", crvBribes, crvDelegationRewards, crvOtcDelegation);
@@ -685,7 +809,7 @@ const main = async () => {
 
   // mapBribeRewards contains the reward amount of each users for each gauges bribed
   // Now, we have to know who claimed their rewards
-  const claimedData = await getAllAccountClaimedSinceLastFreeze();
+  /*const claimedData = await getAllAccountClaimedSinceLastFreeze();
 
   // Organize it by tokens
   const claimedByTokens = {};
@@ -695,7 +819,9 @@ const main = async () => {
     }
 
     claimedByTokens[cd.id.toLowerCase()] = claimedByTokens[cd.id.toLowerCase()].concat(cd.addresses.map((a) => a.toLowerCase()));
-  }
+  }*/
+
+  const claimedByTokens = await getAllAccountClaimedSinceLastFreezeWithAgnostic();
 
   // Now, we get users who didn't claim yet last rewards
   // Map organize by token address

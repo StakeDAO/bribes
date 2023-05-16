@@ -1,7 +1,12 @@
 const { BigNumber } = require("ethers");
 const lastMerkle = require("./merkle.json");
 
-//console.log(lastMerkle.map((m) => m.address));
+console.log("-- FREEZE --");
+console.log(lastMerkle.map((m) => m.address));
+console.log("-----");
+console.log("-- ROOTS --");
+console.log(lastMerkle.map((m) => m.root));
+console.log("-----");
 
 for (const m of lastMerkle) {
     let total = BigNumber.from(0);
