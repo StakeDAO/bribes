@@ -2,10 +2,10 @@ const { BigNumber } = require("ethers");
 const lastMerkle = require("./merkle.json");
 
 console.log("-- FREEZE --");
-console.log(lastMerkle.map((m) => m.address));
+console.log(lastMerkle.filter((m) => m.symbol !== "WBTC").map((m) => m.address));
 console.log("-----");
 console.log("-- ROOTS --");
-console.log(lastMerkle.map((m) => m.root));
+console.log(lastMerkle.filter((m) => m.symbol !== "WBTC").map((m) => m.root));
 console.log("-----");
 
 for (const m of lastMerkle) {
