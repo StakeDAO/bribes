@@ -697,6 +697,17 @@ const extractBribesData = () => {
     }
   }
 
+  const tokens = {};
+  for (const locker of Object.keys(bribes)) {
+    for (const bribe of bribes[locker]) {
+      if (!tokens[bribe.token]) {
+        tokens[bribe.token] = 0;
+      }
+
+      tokens[bribe.token] += bribe.amount;
+    }
+  }
+
   const bribesDelegationsAmounts = {};
 
   for (const row of secondTabRows) {
@@ -731,6 +742,7 @@ const extractBribesData = () => {
   }
 
   fs.writeFileSync(`tmp/bribes.json`, JSON.stringify(bribes));
+  fs.writeFileSync(`tmp/bribesNbTokensToDistribute.json`, JSON.stringify(tokens));
   fs.writeFileSync(`tmp/bribesDelegationsAmounts.json`, JSON.stringify(bribesDelegationsAmounts));
 
   return {
