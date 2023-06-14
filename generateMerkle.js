@@ -680,6 +680,11 @@ const extractBribesData = () => {
       columns[8] = columns[8].replace(",", "");
     }
 
+    const tokenAddress = addressesPerToken[columns[6]];
+    if(!tokenAddress) {
+      throw new Error("Token " + columns[6] + " unknow");
+    }
+
     let bribe = bribes[locker].find((b) => b.gaugeName === columns[0]);
     if (bribe) {
       bribe.amount += parseFloat(columns[8]);
@@ -689,7 +694,7 @@ const extractBribesData = () => {
         token: columns[6],
         symbol: columns[6],
         image: imagesPerToken[columns[6]],
-        address: addressesPerToken[columns[6]],
+        address: tokenAddress,
         amount: parseFloat(columns[8]),
         decimals: 18,
       };
