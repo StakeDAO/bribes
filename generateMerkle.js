@@ -5,7 +5,83 @@ const orderBy = require("lodash/orderBy");
 const { gql, request } = require("graphql-request");
 const axios = require('axios').default;
 const { ethers, utils, BigNumber } = require("ethers");
-const moment = require("moment");
+
+const firstTab = `50RBN-50USDC - 0x81C452E84B10355…65	13/06/2023	28,234.00	RBN	0.15	4,338.25	SDT	0.38	11,412.77	BAL
+80D2D-20USDC - 0x1249c510e066731…9e	13/06/2023	2,297.00	USDC	1.00	2,296.82	SDT	0.38	6,042.31	BAL
+80Silo-20WETH - 0x6661136537dfDCA…5E	13/06/2023	12,592.00	Silo	0.06	693.66	SDT	0.38	1,824.83	BAL
+B-baoUSD-LUSD-BPT - 0x5aF3B93Fb82ab86…11	13/06/2023	183.17	BAL	4.45	815.10	SDT	0.38	2,144.31	BAL
+B-sdBAL-STABLE - 0xDc2Df969EE5E662…f2	13/06/2023	4,792.00	SDT	0.39	1,865.49	SDT	0.38	4,907.60	BAL
+swETH-bb-a-WETH-BPT - 0x11Ff498C7c2A29f…A5	13/06/2023	1.14	swETH	1,783.97	2,033.73	SDT	0.38	5,350.20	BAL
+COIL+FRAXBP (0xAF42…DF33)	13/06/2023	51.55	FXS	4.94	254.65	SDT	0.38	669.92	CRV
+COIL+FRAXBP (0xAF42…DF33)	13/06/2023	12,095.00	SPR	2.42	29,318.56	SDT	0.38	77,129.23	CRV
+ETH+LDO (0x9409…72B5)	13/06/2023	7,006.00	LDO	1.82	12,750.63	SDT	0.38	33,543.47	CRV
+ETH+OETH (0x94B1…13E7)	13/06/2023	1,704,240.00	OGV	0.01	13,750.80	SDT	0.38	36,174.65	CRV
+ETH+msETH (0xc897…0025)	13/06/2023	4,715.00	MET	1.30	6,129.71	SDT	0.38	16,125.61	CRV
+GUSD+FRAXBP (0x4e43…8D93)	13/06/2023	262.20	FXS	4.94	1,295.31	SDT	0.38	3,407.61	CRV
+LUSD+FRAXBP (0x497C…fd25)	13/06/2023	262.90	FXS	4.94	1,298.72	SDT	0.38	3,416.58	CRV
+OGV+ETH (0xB5ae…D58c)	13/06/2023	493,914.00	OGV	0.01	3,984.46	SDT	0.38	10,482.04	CRV
+OHM+FRAXBP (0xFc1e…E48D)	13/06/2023	262.20	FXS	4.94	1,295.31	SDT	0.38	3,407.61	CRV
+USDT+WBTC+WETH (0xD51a…AE46)	13/06/2023	50,402.00	CRV	0.65	32,975.14	SDT	0.38	86,748.70	CRV
+WACME+frxETH (0x7bbE…7fa3)	13/06/2023	6.49	FXS	4.94	32.03	SDT	0.38	84.26	CRV
+WACME+frxETH (0x7bbE…7fa3)	13/06/2023	25,765.00	WACME	0.03	798.00	SDT	0.38	2,099.32	CRV
+WETH+CRV (0x8301…C511)	13/06/2023	41,762.00	CRV	0.65	27,328.93	SDT	0.38	71,895.05	CRV
+XAI+FRAXBP (0x3262…b669)	13/06/2023	262.90	FXS	4.94	1,298.72	SDT	0.38	3,416.58	CRV
+arbitrum-FRAX+USDC (0xC9B8…40d5)	13/06/2023	152.64	FXS	4.94	754.04	SDT	0.38	1,983.68	CRV
+arbitrum-USDT+WBTC+WETH (0x960e…5590)	13/06/2023	6,971.00	CRV	0.65	4,560.23	SDT	0.38	11,996.74	CRV
+arbitrum-VST+FRAX (0x59bF…6Ba4)	13/06/2023	723.17	FXS	4.94	3,572.45	SDT	0.38	9,398.15	CRV
+eCFX+ETH (0x5ac4…3F38)	13/06/2023	16,902.00	eCFX	0.17	2,955.61	SDT	0.38	7,775.41	CRV
+msUSD+FRAXBP (0xc3b1…51dD)	13/06/2023	1,060.00	MET	1.30	1,377.93	SDT	0.38	3,624.96	CRV
+optimism-FRAX+USDC (0x29A3…bFe7)	13/06/2023	242.21	FXS	4.94	1,196.51	SDT	0.38	3,147.70	CRV
+polygon-CRV+crvUSDBTCETH (0xc7c9…8Fa7)	13/06/2023	12,892.00	CRV	0.65	8,436.72	SDT	0.38	22,194.74	CRV
+sUSD+FRAXBP (0xe3c1…f5eF)	13/06/2023	141.47	FXS	4.94	698.86	SDT	0.38	1,838.51	CRV
+xdai-WXDAI+USDC+USDT (0x7f90…F353)	13/06/2023	20.80	GNO	109.37	2,274.83	SDT	0.38	5,984.46	CRV
+Temple FRAX/TEMPLE	13/06/2023	3,158.00	DAI	1.00	3,154.83	sdFXS	5.51	572.08	FXS
+Convex stkcvxSDTFRAXBP	13/06/2023	147.33	sdFXS	4.88	718.92	sdFXS	5.51	130.36	FXS`;
+
+  const secondTab = `0x52ea58f4FC3CEd48fa18E909226c1f8A0EF887DC	arbitrum-FRAX+USDC (0xC9B8…40d5)	3.00	496,695.76	100.00%	SDT	1,983.676	754	0.0015	CRV
+0x52ea58f4FC3CEd48fa18E909226c1f8A0EF887DC	arbitrum-USDT+WBTC+WETH (0x960e…5590)	4.00	662,261.01	100.00%	SDT	11,996.736	4,560	0.0069	CRV
+0x52ea58f4FC3CEd48fa18E909226c1f8A0EF887DC	arbitrum-VST+FRAX (0x59bF…6Ba4)	2.50	413,913.13	71.04%	SDT	6,676.804	2,538	0.0061	CRV
+0x52ea58f4FC3CEd48fa18E909226c1f8A0EF887DC	eCFX+ETH (0x5ac4…3F38)	2.50	413,913.13	55.09%	SDT	4,283.584	1,628	0.0039	CRV
+0x52ea58f4FC3CEd48fa18E909226c1f8A0EF887DC	ETH+LDO (0x9409…72B5)	11.50	1,904,000.41	100.00%	SDT	33,543.470	12,751	0.0067	CRV
+0x52ea58f4FC3CEd48fa18E909226c1f8A0EF887DC	ETH+msETH (0xc897…0025)	2.00	331,130.51	49.53%	SDT	7,987.103	3,036	0.0092	CRV
+0x52ea58f4FC3CEd48fa18E909226c1f8A0EF887DC	ETH+OETH (0x94B1…13E7)	6.00	993,391.52	54.76%	SDT	19,810.013	7,530	0.0076	CRV
+0x52ea58f4FC3CEd48fa18E909226c1f8A0EF887DC	OGV+ETH (0xB5ae…D58c)	2.00	331,130.51	66.25%	SDT	6,944.148	2,640	0.0080	CRV
+0x52ea58f4FC3CEd48fa18E909226c1f8A0EF887DC	polygon-CRV+crvUSDBTCETH (0xc7c9…8Fa7)	7.50	1,241,739.40	100.00%	SDT	22,194.736	8,437	0.0068	CRV
+0x52ea58f4FC3CEd48fa18E909226c1f8A0EF887DC	sUSD+FRAXBP (0xe3c1…f5eF)	3.00	496,695.76	100.00%	SDT	1,838.512	699	0.0014	CRV
+0x52ea58f4FC3CEd48fa18E909226c1f8A0EF887DC	USDT+WBTC+WETH (0xD51a…AE46)	31.00	5,132,522.86	100.00%	SDT	86,748.703	32,975	0.0064	CRV
+0x52ea58f4FC3CEd48fa18E909226c1f8A0EF887DC	WETH+CRV (0x8301…C511)	25.00	4,139,131.34	97.61%	SDT	70,178.826	26,677	0.0064	CRV
+0xa7888F85BD76deeF3Bd03d4DbCF57765a49883b3	COIL+FRAXBP (0xAF42…DF33)	100.00	1,922,739.56	51.08%	SDT	39,739.967	15,106	0.0079	CRV
+0xb0e83C2D71A991017e0116d58c5765Abc57384af	arbitrum-VST+FRAX (0x59bF…6Ba4)	5.00	168,703.80	28.96%	SDT	2,721.349	1,034	0.0061	CRV
+0xb0e83C2D71A991017e0116d58c5765Abc57384af	eCFX+ETH (0x5ac4…3F38)	10.00	337,407.60	44.91%	SDT	3,491.829	1,327	0.0039	CRV
+0xb0e83C2D71A991017e0116d58c5765Abc57384af	ETH+msETH (0xc897…0025)	10.00	337,407.60	50.47%	SDT	8,138.511	3,094	0.0092	CRV
+0xb0e83C2D71A991017e0116d58c5765Abc57384af	ETH+OETH (0x94B1…13E7)	15.00	506,111.41	27.90%	SDT	10,092.771	3,836	0.0076	CRV
+0xb0e83C2D71A991017e0116d58c5765Abc57384af	GUSD+FRAXBP (0x4e43…8D93)	5.00	168,703.80	100.00%	SDT	3,407.611	1,295	0.0077	CRV
+0xb0e83C2D71A991017e0116d58c5765Abc57384af	LUSD+FRAXBP (0x497C…fd25)	5.00	168,703.80	100.00%	SDT	3,416.582	1,299	0.0077	CRV
+0xb0e83C2D71A991017e0116d58c5765Abc57384af	msUSD+FRAXBP (0xc3b1…51dD)	5.00	168,703.80	100.00%	SDT	3,624.962	1,378	0.0082	CRV
+0xb0e83C2D71A991017e0116d58c5765Abc57384af	OGV+ETH (0xB5ae…D58c)	5.00	168,703.80	33.75%	SDT	3,537.892	1,345	0.0080	CRV
+0xb0e83C2D71A991017e0116d58c5765Abc57384af	OHM+FRAXBP (0xFc1e…E48D)	5.00	168,703.80	100.00%	SDT	3,407.611	1,295	0.0077	CRV
+0xb0e83C2D71A991017e0116d58c5765Abc57384af	optimism-FRAX+USDC (0x29A3…bFe7)	5.00	168,703.80	100.00%	SDT	3,147.695	1,197	0.0071	CRV
+0xb0e83C2D71A991017e0116d58c5765Abc57384af	WACME+frxETH (0x7bbE…7fa3)	2.00	67,481.52	100.00%	SDT	2,183.585	830	0.0123	CRV
+0xb0e83C2D71A991017e0116d58c5765Abc57384af	WETH+CRV (0x8301…C511)	3.00	101,222.28	2.39%	SDT	1,716.220	652	0.0064	CRV
+0xb0e83C2D71A991017e0116d58c5765Abc57384af	XAI+FRAXBP (0x3262…b669)	5.00	168,703.80	100.00%	SDT	3,416.582	1,299	0.0077	CRV
+0xb0e83C2D71A991017e0116d58c5765Abc57384af	xdai-WXDAI+USDC+USDT (0x7f90…F353)	5.00	168,703.80	100.00%	SDT	5,984.464	2,275	0.0135	CRV
+0x73Eb240a06f0e0747C698A219462059be6AacCc8	ETH+OETH (0x94B1…13E7)	100.00	314,508.42	17.34%	SDT	6,271.863	2,384	0.0076	CRV
+0x52ea58f4FC3CEd48fa18E909226c1f8A0EF887DC	Convex stkcvxSDTFRAXBP	20.00	62,418.12	45.60%	sdFXS	59.448	328	0.0053	FXS
+0x52ea58f4FC3CEd48fa18E909226c1f8A0EF887DC	Temple FRAX/TEMPLE	80.00	249,672.49	60.90%	sdFXS	348.412	1,921	0.0077	FXS
+0xb0e83C2D71A991017e0116d58c5765Abc57384af	Temple FRAX/TEMPLE	100.00	160,277.57	39.10%	sdFXS	223.664	1,233	0.0077	FXS
+0xF930EBBd05eF8b25B1797b9b2109DDC9B0d43063	Convex stkcvxSDTFRAXBP	100.00	74,458.96	54.40%	sdFXS	70.916	391	0.0053	FXS
+0x52ea58f4FC3CEd48fa18E909226c1f8A0EF887DC	50RBN-50USDC - 0x81C452E84B10355…65	29.70	11,638.40	46.51%	SDT	5,308.529	2,018	0.1734	BAL
+0x52ea58f4FC3CEd48fa18E909226c1f8A0EF887DC	80D2D-20USDC - 0x1249c510e066731…9e	35.64	13,966.07	100.00%	SDT	6,042.314	2,297	0.1645	BAL
+0x52ea58f4FC3CEd48fa18E909226c1f8A0EF887DC	B-baoUSD-LUSD-BPT - 0x5aF3B93Fb82ab86…11	7.92	3,103.57	64.98%	SDT	1,393.301	530	0.1707	BAL
+0x52ea58f4FC3CEd48fa18E909226c1f8A0EF887DC	B-sdBAL-STABLE - 0xDc2Df969EE5E662…f2	8.91	3,491.52	29.65%	SDT	1,455.152	553	0.1584	BAL
+0x52ea58f4FC3CEd48fa18E909226c1f8A0EF887DC	swETH-bb-a-WETH-BPT - 0x11Ff498C7c2A29f…A5	17.82	6,983.04	51.07%	SDT	2,732.140	1,039	0.1487	BAL
+0xb0e83C2D71A991017e0116d58c5765Abc57384af 	50RBN-50USDC - 0x81C452E84B10355…65	40	13382.9084	53.49%	SDT	6,104.237	2,320	0.1734	BAL
+0xb0e83C2D71A991017e0116d58c5765Abc57384af 	80Silo-20WETH - 0x6661136537dfDCA…5E	20	6691.4542	100.00%	SDT	1,824.832	694	0.1037	BAL
+0xb0e83C2D71A991017e0116d58c5765Abc57384af 	B-baoUSD-LUSD-BPT - 0x5aF3B93Fb82ab86…11	5	1672.86355	35.02%	SDT	751.007	285	0.1707	BAL
+0xb0e83C2D71A991017e0116d58c5765Abc57384af 	B-sdBAL-STABLE - 0xDc2Df969EE5E662…f2	15	5018.59065	42.62%	SDT	2,091.586	795	0.1584	BAL
+0xb0e83C2D71A991017e0116d58c5765Abc57384af 	swETH-bb-a-WETH-BPT - 0x11Ff498C7c2A29f…A5	20	6691.4542	48.93%	SDT	2,618.056	995	0.1487	BAL
+0xF930EBBd05eF8b25B1797b9b2109DDC9B0d43063 	B-sdBAL-STABLE - 0xDc2Df969EE5E662…f2	100	3265.281538	27.73%	SDT	1,360.863	517	0.1584	BAL
+0xc47ec74a753acb09e4679979afc428cde0209639	COIL+FRAXBP (0xAF42…DF33)	100.00	1,841,417.76	48.92%	SDT	38,059.175	14,467	0.0079	CRV`;
 
 // LAST MERKLE
 const lastMerkle = require("./lastMerkle.json");
@@ -568,6 +644,101 @@ const bribesRun = async (idProposal, space, bribes, delegationRewards, otcDelega
   return mapBribeRewards;
 };
 
+const extractBribesData = () => {
+  
+  // Split on tab (columns)
+  const firstTabRows = firstTab.split("\n");
+  const secondTabRows = secondTab.split("\n");
+
+  const bribes = {};
+
+  const imagesPerToken = {
+    "SDT": SDT_IMAGE,
+    "sdFXS": "https://assets.coingecko.com/coins/images/13423/small/Frax_Shares_icon.png?1679886947",
+    "sdCRV": "https://assets.coingecko.com/coins/images/27756/small/scCRV-2.png?1665654580",
+    "sdBAL": "https://assets.coingecko.com/coins/images/11683/small/Balancer.png?1592792958",
+    "sdANGLE": "https://assets.coingecko.com/coins/images/19060/small/ANGLE_Token-light.png?1666774221"
+  };
+
+  const addressesPerToken = {
+    "SDT": SDT_ADDRESS,
+    "sdFXS": SDFXS,
+    "sdCRV": SD_CRV,
+    "sdBAL": SDBAL,
+    "sdANGLE": SDANGLE
+  };
+
+  for (const row of firstTabRows) {
+    const columns = row.split("\t");
+
+    const locker = columns[9];
+    if (!bribes[locker]) {
+      bribes[locker] = [];
+    }
+
+    while (columns[8].indexOf(",") > -1) {
+      columns[8] = columns[8].replace(",", "");
+    }
+
+    let bribe = bribes[locker].find((b) => b.gaugeName === columns[0]);
+    if (bribe) {
+      bribe.amount += parseFloat(columns[8]);
+    } else {
+      bribe = {
+        gaugeName: columns[0],
+        token: columns[6],
+        symbol: columns[6],
+        image: imagesPerToken[columns[6]],
+        address: addressesPerToken[columns[6]],
+        amount: parseFloat(columns[8]),
+        decimals: 18,
+      };
+      bribes[locker].push(bribe);
+    }
+  }
+
+  const bribesDelegationsAmounts = {};
+
+  for (const row of secondTabRows) {
+    const columns = row.split("\t");
+
+    if (DELEGATION_ADDRESS.toLowerCase() !== columns[0].trim().toLowerCase()) {
+      continue;
+    }
+
+    const locker = columns[9];
+    let bribe = bribes[locker].find((b) => b.gaugeName === columns[1]);
+    if (!bribe) {
+      throw new Error("no bribe for " + locker);
+    }
+
+    while (columns[6].indexOf(",") > -1) {
+      columns[6] = columns[6].replace(",", "");
+    }
+
+    const amount = parseFloat(columns[6]);
+
+    bribe.amount -= amount;
+    if (bribe.amount < 0) {
+      bribe.amount = 0;
+    }
+
+    if (!bribesDelegationsAmounts[locker]) {
+      bribesDelegationsAmounts[locker] = amount;
+    } else {
+      bribesDelegationsAmounts[locker] += amount;
+    }
+  }
+
+  fs.writeFileSync(`tmp/bribes.json`, JSON.stringify(bribes));
+  fs.writeFileSync(`tmp/bribesDelegationsAmounts.json`, JSON.stringify(bribesDelegationsAmounts));
+
+  return {
+    bribes,
+    bribesDelegationsAmounts
+  };
+};
+
 const main = async () => {
 
   /*********** Inputs ********/
@@ -576,307 +747,20 @@ const main = async () => {
   const fraxIdProposal = "0xf6c83c798c65976383caf1e946c8de551e6153f3d0507d8fbbed6e0dbe3d50a5";
   //const angleIdProposal = "0x5cc81e3b7a4039a498819389d63ccf4c3dd06cfd2da7ab7170a15e05ae858da9";
 
-  const crvBribes = [
-    {
-      gaugeName: "COIL+FRAXBP (0xAF42…DF33)",
-      token: "SDT",
-      symbol: "SDT",
-      image: SDT_IMAGE,
-      address: SDT_ADDRESS,
-      amount: 669.92 + 77129.23,
-      decimals: 18,
-    },
-    {
-      gaugeName: "ETH+LDO (0x9409…72B5)",
-      token: "SDT",
-      symbol: "SDT",
-      image: SDT_IMAGE,
-      address: SDT_ADDRESS,
-      amount: 33543.47 - 33543.47,
-      decimals: 18,
-    },
-    {
-      gaugeName: "ETH+OETH (0x94B1…13E7)",
-      token: "SDT",
-      symbol: "SDT",
-      image: SDT_IMAGE,
-      address: SDT_ADDRESS,
-      amount: 36174.65 - 19810.01,
-      decimals: 18,
-    },
-    {
-      gaugeName: "ETH+msETH (0xc897…0025)",
-      token: "SDT",
-      symbol: "SDT",
-      image: SDT_IMAGE,
-      address: SDT_ADDRESS,
-      amount: 16125.61 - 7987.103,
-      decimals: 18,
-    },
-    {
-      gaugeName: "GUSD+FRAXBP (0x4e43…8D93)",
-      token: "SDT",
-      symbol: "SDT",
-      image: SDT_IMAGE,
-      address: SDT_ADDRESS,
-      amount: 3407.61,
-      decimals: 18,
-    },
-    {
-      gaugeName: "LUSD+FRAXBP (0x497C…fd25)",
-      token: "SDT",
-      symbol: "SDT",
-      image: SDT_IMAGE,
-      address: SDT_ADDRESS,
-      amount: 3416.58,
-      decimals: 18,
-    },
-    {
-      gaugeName: "OGV+ETH (0xB5ae…D58c)",
-      token: "SDT",
-      symbol: "SDT",
-      image: SDT_IMAGE,
-      address: SDT_ADDRESS,
-      amount: 10482.04 - 6944.148,
-      decimals: 18,
-    },
-    {
-      gaugeName: "OHM+FRAXBP (0xFc1e…E48D)",
-      token: "SDT",
-      symbol: "SDT",
-      image: SDT_IMAGE,
-      address: SDT_ADDRESS,
-      amount: 3407.61,
-      decimals: 18,
-    },
-    {
-      gaugeName: "USDT+WBTC+WETH (0xD51a…AE46)",
-      token: "SDT",
-      symbol: "SDT",
-      image: SDT_IMAGE,
-      address: SDT_ADDRESS,
-      amount: 86748.70 - 86748.70,
-      decimals: 18,
-    },
-    {
-      gaugeName: "WACME+frxETH (0x7bbE…7fa3)",
-      token: "SDT",
-      symbol: "SDT",
-      image: SDT_IMAGE,
-      address: SDT_ADDRESS,
-      amount: 84.26 + 2099.32,
-      decimals: 18,
-    },
-    {
-      gaugeName: "WETH+CRV (0x8301…C511)",
-      token: "SDT",
-      symbol: "SDT",
-      image: SDT_IMAGE,
-      address: SDT_ADDRESS,
-      amount: 71895.05 - 70178.82,
-      decimals: 18,
-    },
-    {
-      gaugeName: "XAI+FRAXBP (0x3262…b669)",
-      token: "SDT",
-      symbol: "SDT",
-      image: SDT_IMAGE,
-      address: SDT_ADDRESS,
-      amount: 3416.58,
-      decimals: 18,
-    },
-    {
-      gaugeName: "arbitrum-FRAX+USDC (0xC9B8…40d5)",
-      token: "SDT",
-      symbol: "SDT",
-      image: SDT_IMAGE,
-      address: SDT_ADDRESS,
-      amount: 1983.68 - 1983.68,
-      decimals: 18,
-    },
-    {
-      gaugeName: "arbitrum-USDT+WBTC+WETH (0x960e…5590)",
-      token: "SDT",
-      symbol: "SDT",
-      image: SDT_IMAGE,
-      address: SDT_ADDRESS,
-      amount: 11996.74 - 11996.74,
-      decimals: 18,
-    },
-    {
-      gaugeName: "arbitrum-VST+FRAX (0x59bF…6Ba4)",
-      token: "SDT",
-      symbol: "SDT",
-      image: SDT_IMAGE,
-      address: SDT_ADDRESS,
-      amount: 9398.15 - 6676.80,
-      decimals: 18,
-    },
-    {
-      gaugeName: "eCFX+ETH (0x5ac4…3F38)",
-      token: "SDT",
-      symbol: "SDT",
-      image: SDT_IMAGE,
-      address: SDT_ADDRESS,
-      amount: 7775.41 - 4283.58,
-      decimals: 18,
-    },
-    {
-      gaugeName: "msUSD+FRAXBP (0xc3b1…51dD)",
-      token: "SDT",
-      symbol: "SDT",
-      image: SDT_IMAGE,
-      address: SDT_ADDRESS,
-      amount: 3624.96,
-      decimals: 18,
-    },
-    {
-      gaugeName: "optimism-FRAX+USDC (0x29A3…bFe7)",
-      token: "SDT",
-      symbol: "SDT",
-      image: SDT_IMAGE,
-      address: SDT_ADDRESS,
-      amount: 3147.70,
-      decimals: 18,
-    },
-    {
-      gaugeName: "polygon-CRV+crvUSDBTCETH (0xc7c9…8Fa7)",
-      token: "SDT",
-      symbol: "SDT",
-      image: SDT_IMAGE,
-      address: SDT_ADDRESS,
-      amount: 22194.74 - 22194.74,
-      decimals: 18,
-    },
-    {
-      gaugeName: "sUSD+FRAXBP (0xe3c1…f5eF)",
-      token: "SDT",
-      symbol: "SDT",
-      image: SDT_IMAGE,
-      address: SDT_ADDRESS,
-      amount: 1838.51 - 1838.51,
-      decimals: 18,
-    },
-    {
-      gaugeName: "xdai-WXDAI+USDC+USDT (0x7f90…F353)",
-      token: "SDT",
-      symbol: "SDT",
-      image: SDT_IMAGE,
-      address: SDT_ADDRESS,
-      amount: 5984.46,
-      decimals: 18,
-    }
-  ]
+  const bribesData = extractBribesData();
 
-  const balBribes = [
-    {
-      gaugeName: "50RBN-50USDC - 0x81C452E84B10355…65",
-      token: "SDT",
-      symbol: "SDT",
-      image: SDT_IMAGE,
-      address: SDT_ADDRESS,
-      amount: 11412.77 - 5308.529,
-      decimals: 18,
-    },
-    {
-      gaugeName: "80D2D-20USDC - 0x1249c510e066731…9e",
-      token: "SDT",
-      symbol: "SDT",
-      image: SDT_IMAGE,
-      address: SDT_ADDRESS,
-      amount: 6042.31 - 6042.31,
-      decimals: 18,
-    },
-    {
-      gaugeName: "80Silo-20WETH - 0x6661136537dfDCA…5E",
-      token: "SDT",
-      symbol: "SDT",
-      image: SDT_IMAGE,
-      address: SDT_ADDRESS,
-      amount: 1824.83,
-      decimals: 18,
-    },
-    {
-      gaugeName: "B-baoUSD-LUSD-BPT - 0x5aF3B93Fb82ab86…11",
-      token: "SDT",
-      symbol: "SDT",
-      image: SDT_IMAGE,
-      address: SDT_ADDRESS,
-      amount: 2144.31 - 1393.301,
-      decimals: 18,
-    },
-    {
-      gaugeName: "B-sdBAL-STABLE - 0xDc2Df969EE5E662…f2",
-      token: "SDT",
-      symbol: "SDT",
-      image: SDT_IMAGE,
-      address: SDT_ADDRESS,
-      amount: 4907.60 - 1455.152,
-      decimals: 18,
-    },
-    {
-      gaugeName: "swETH-bb-a-WETH-BPT - 0x11Ff498C7c2A29f…A5",
-      token: "SDT",
-      symbol: "SDT",
-      image: SDT_IMAGE,
-      address: SDT_ADDRESS,
-      amount: 5350.20 - 2732.140,
-      decimals: 18,
-    },
-    
-
-    // YK
-    /*{
-      gaugeName: "20WBTC-80BADGER",
-      token: "sdBAL",
-      symbol: "sdBAL",
-      image: "https://cryptologos.cc/logos/balancer-bal-logo.png",
-      address: SDBAL,
-      amount: 32.962 + 32.962,
-      decimals: 18,
-    },*/
-    // HH Gauges, gauge which have 0 vote
-    /*{
-      gaugeName: "wstETH-rETH-sfrxETH-BPT",
-      token: "sdBAL",
-      symbol: "sdBAL",
-      image: "https://cryptologos.cc/logos/balancer-bal-logo.png",
-      address: SDBAL,
-      amount: 0,
-      decimals: 18,
-    }*/
-  ];
-
-  const fraxBribes = [
-    {
-      gaugeName: "Temple FRAX/TEMPLE",
-      token: "sdFXS",
-      symbol: "sdFXS",
-      image: "https://assets.coingecko.com/coins/images/13423/small/Frax_Shares_icon.png?1679886947",
-      address: SDFXS,
-      amount: 572.08 - 348.412,
-      decimals: 18,
-    },
-    {
-      gaugeName: "Convex stkcvxSDTFRAXBP",
-      token: "sdFXS",
-      symbol: "sdFXS",
-      image: "https://assets.coingecko.com/coins/images/13423/small/Frax_Shares_icon.png?1679886947",
-      address: SDFXS,
-      amount: 130.36 - 59.448,
-      decimals: 18,
-    }
-  ];
-
-  const angleBribes = [];
+  const crvBribes = bribesData.bribes["CRV"] || [];
+  const balBribes = bribesData.bribes["BAL"] || [];
+  const fraxBribes = bribesData.bribes["FXS"] || [];
+  const angleBribes = bribesData.bribes["ANGLE"] || [];
 
   const bribes = crvBribes.concat(balBribes).concat(fraxBribes).concat(angleBribes);
 
   // Delegations
-  const crvDelegationRewards = 1983.68 + 11996.74 + 6676.80 + 4283.58 + 33543.47 + 7987.103 + 19810.01 + 6944.148 + 22194.74 + 1838.51 + 86748.70 + 70178.82;
-  const balDelegationRewards = 5308.529 + 6042.31 + 1393.301 + 1455.152 + 2732.140;
-  const fraxDelegationRewards = 59.448 + 348.412;
-  const angleDelegationRewards = 0;
+  const crvDelegationRewards = bribesData.bribesDelegationsAmounts["CRV"] || 0;
+  const balDelegationRewards = bribesData.bribesDelegationsAmounts["BAL"] || 0;
+  const fraxDelegationRewards = bribesData.bribesDelegationsAmounts["FXS"] || 0;
+  const angleDelegationRewards = bribesData.bribesDelegationsAmounts["ANGLE"] || 0;
 
   // OTC
   const crvOtcDelegation = [];
