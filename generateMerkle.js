@@ -903,10 +903,6 @@ const main = async () => {
       for (const u of usersWhoNeedClaim[tokenAddress]) {
         if (u.account.toLowerCase() === r.voter.toLowerCase() && BigNumber.from(r.amount).gt(0)) {
           find = true;
-          if(u.account.toLocaleLowerCase() == "0x05ce7c0df5d2ee867c8400fce77c05c0a4bca00d".toLocaleLowerCase()){
-            console.log(tokenAddress, u.account, Number(r.amount), Number(u.amount))
-            console.log("===========")
-          }
           u.amount = BigNumber.from(u.amount).add(BigNumber.from(r.amount));
           break;
         }
