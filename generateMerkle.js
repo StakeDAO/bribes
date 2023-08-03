@@ -201,13 +201,14 @@ ORDER BY timestamp DESC
 LIMIT 1
 `;
 
-const DATE_LAST_UPDATE_QUERY = (timestamp) => `
+const DATE_LAST_UPDATE_QUERY = (timestamp, tokenAddress) => `
 SELECT
     timestamp
 FROM evm_events_ethereum_mainnet
 WHERE
     address = '0x03E34b085C52985F6a5D27243F20C84bDdc01Db4' and
     timestamp < '${timestamp}' and
+    input_0_value_address = '${tokenAddress}' and
     signature = 'MerkleRootUpdated(address,bytes32,uint256)'
 ORDER BY timestamp DESC
 LIMIT 1
@@ -270,9 +271,9 @@ const getAllAccountClaimedSinceLastFreeze = async () => {
   return result.lastClaimeds;
 };
 
-const getAllAccountClaimedSinceLastFreezeWithAgnostic = async () => {
+const getAllAccountClaimedSinceLastFreezeWithAgnostic = async (tokenAddress) => {
   const lastClaim = await agnosticFetch(DATE_LAST_CLAIM_QUERY);
-  const lastUpdate = await agnosticFetch(DATE_LAST_UPDATE_QUERY(lastClaim[0][0]));
+  const lastUpdate = await agnosticFetch(DATE_LAST_UPDATE_QUERY(lastClaim[0][0], tokenAddress));
 
   const lastClaimTimestamp = lastClaim[0][0];
   const lastUpdateTimestamp = lastUpdate[0][0];
@@ -840,7 +841,12 @@ const main = async () => {
     claimedByTokens[cd.id.toLowerCase()] = claimedByTokens[cd.id.toLowerCase()].concat(cd.addresses.map((a) => a.toLowerCase()));
   }*/
 
-  const claimedByTokens = await getAllAccountClaimedSinceLastFreezeWithAgnostic();
+  const claimedByTokens = {};
+  for (const bribe of lastMerkle) {
+    const d = await getAllAccountClaimedSinceLastFreezeWithAgnostic(bribe.address);
+    claimedByTokens[bribe.address.toLowerCase()] = d[bribe.address.toLowerCase()] || [];
+  }
+  
 
   // Now, we get users who didn't claim yet last rewards
   // Map organize by token address
