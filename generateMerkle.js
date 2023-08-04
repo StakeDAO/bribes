@@ -668,6 +668,9 @@ const extractBribesData = () => {
 
   for (const row of firstTabRows) {
     const columns = row.split("\t");
+    for(let i = 0; i < columns.length; i++) {
+      columns[i] = columns[i].trim();
+    }
 
     const locker = columns[9];
     if (!bribes[locker]) {
@@ -720,6 +723,9 @@ const extractBribesData = () => {
 
   for (const row of secondTabRows) {
     const columns = row.split("\t");
+    for(let i = 0; i < columns.length; i++) {
+      columns[i] = columns[i].trim();
+    }
 
     if (DELEGATION_ADDRESS.toLowerCase() !== columns[0].trim().toLowerCase()) {
       continue;
