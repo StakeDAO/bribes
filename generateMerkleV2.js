@@ -46,6 +46,13 @@ const SPACES_IMAGE = {
   [SDANGLE_SPACE]: "https://assets.coingecko.com/coins/images/19060/small/ANGLE_Token-light.png?1666774221"
 };
 
+const SPACES_UNDERLYING_TOKEN = {
+  [SDCRV_SPACE]: "0xd533a949740bb3306d119cc777fa900ba034cd52",
+  [SDBAL_SPACE]: "0xba100000625a3754423978a60c9317c58a424e3d",
+  [SDFXS_SPACE]: "0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0",
+  [SDANGLE_SPACE]: "0x31429d1856ad1377a8a0079410b297e1a9e214c2"
+};
+
 const main = async () => {
 
   const csvResult = extractCSV();
@@ -57,6 +64,7 @@ const main = async () => {
   const proposalIdPerSpace = await fetchLastProposalsIds();
 
   const newMerkles = [];
+  const delegationAPRs = {};
 
   for (const space of Object.keys(proposalIdPerSpace)) {
     if (!SPACES_SYMBOL[space]) {
@@ -65,6 +73,8 @@ const main = async () => {
     if (!SPACES_IMAGE[space]) {
       throw new Error("No image defined for space " + space);
     }
+
+    const tokenPrice = await getTokenPrice(space);
 
     const id = proposalIdPerSpace[space];
 
@@ -196,6 +206,10 @@ const main = async () => {
       throw new Error("Delegation split rewards wrong " + delegationVote.totalRewards + " - " + totalSplitDelegationRewards);
     }
 
+    // Calculate delegation apr
+    const delegationAPR = ((Number(delegationVote.totalRewards) * 26 * tokenPrice) / delegatorSumVotingPower) * 100 / tokenPrice;
+    delegationAPRs[space] = delegationAPR;
+
     // Create a map with userAddress => reward amount
     const userRewards = {};
     for (const voter of voters) {
@@ -300,14 +314,14 @@ const main = async () => {
   }
 
   fs.writeFileSync(`./merkleV2.json`, JSON.stringify(newMerkles));
-
+  fs.writeFileSync(`./delegationsAPRs.json`, JSON.stringify(delegationAPRs));
 }
 
 const extractCSV = () => {
   // TODO
   return {
     [SDCRV_SPACE]: {
-      "0x8d867bef70c6733ff25cc0d1caa8aa6c38b24817": 10000
+      "0x8d867bef70c6733ff25cc0d1caa8aa6c38b24817": 280000,
     }
   }
 };
@@ -684,6 +698,13 @@ const agnosticFetch = async (query) => {
     console.error(e);
     return [];
   }
+}
+
+const getTokenPrice = async (space) => {
+  const key = `ethereum:${SPACES_UNDERLYING_TOKEN[space]}`;
+  const resp = await axios.get(`https://coins.llama.fi/prices/current/${key}`);
+
+  return resp.data.coins[key].price;
 }
 
 main();
