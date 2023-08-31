@@ -7,9 +7,6 @@ const axios = require('axios').default;
 const { utils, BigNumber } = require("ethers");
 const { formatUnits, parseEther } = require("viem");
 
-const SKIP_MERKLE_TOKENS = ["0x2260fac5e5542a773aa44fbcfedf7c193bc2c599"]
-
-const SDT_ADDRESS = "0x73968b9a57c6E53d41345FD57a6E6ae27d6CDB2F";
 const MERKLE_ADDRESS = "0x03E34b085C52985F6a5D27243F20C84bDdc01Db4";
 
 const SNAPSHOT_ENDPOINT = "https://hub.snapshot.org/graphql";
@@ -67,12 +64,7 @@ const main = async () => {
   const delegationAPRs = {};
 
   for (const space of Object.keys(proposalIdPerSpace)) {
-    if (!SPACES_SYMBOL[space]) {
-      throw new Error("No symbol defined for space " + space);
-    }
-    if (!SPACES_IMAGE[space]) {
-      throw new Error("No image defined for space " + space);
-    }
+    checkSpace(space);
 
     const tokenPrice = await getTokenPrice(space);
 
@@ -705,6 +697,21 @@ const getTokenPrice = async (space) => {
   const resp = await axios.get(`https://coins.llama.fi/prices/current/${key}`);
 
   return resp.data.coins[key].price;
+}
+
+const checkSpace = (space) => {
+  if (!SPACES_SYMBOL[space]) {
+    throw new Error("No symbol defined for space " + space);
+  }
+  if (!SPACES_IMAGE[space]) {
+    throw new Error("No image defined for space " + space);
+  }
+  if (!SPACES_UNDERLYING_TOKEN[space]) {
+    throw new Error("No underlying token defined for space " + space);
+  }
+  if (!SPACES_TOKENS[space]) {
+    throw new Error("No sdToken defined for space " + space);
+  }
 }
 
 main();
