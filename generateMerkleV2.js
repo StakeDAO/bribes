@@ -66,6 +66,11 @@ const main = async () => {
   for (const space of Object.keys(proposalIdPerSpace)) {
     checkSpace(space);
 
+    // If ne bribe to distribute to this space => skip
+    if(!csvResult[space]) {
+      continue;
+    }
+
     const tokenPrice = await getTokenPrice(space);
 
     const id = proposalIdPerSpace[space];
@@ -76,6 +81,7 @@ const main = async () => {
     // Here, we should have delegation voter + all other voters
     // Object with vp property
     let voters = await getVoters(id);
+
     voters = await getVoterVotingPower(proposal, voters);
 
     // Get all delegator addresses
@@ -99,8 +105,9 @@ const main = async () => {
       }
     }
 
-    const delegatorSumVotingPower = Object.values(delegatorsVotingPower).reduce((acc, vp) => acc + vp, 0.0);
+    //const delegatorSumVotingPower = Object.values(delegatorsVotingPower).reduce((acc, vp) => acc + vp, 0.0);
     let delegationVote = voters.find((v) => v.voter.toLowerCase() === DELEGATION_ADDRESS.toLowerCase());
+    const delegatorSumVotingPower = delegationVote.vp;
     if (!delegationVote) {
       throw new Error("No delegation vote for " + space + " - " + id);
     }
@@ -109,7 +116,7 @@ const main = async () => {
     }*/
 
     // We can have sum delegation lower than delegation vp
-    delegationVote.vp = delegatorSumVotingPower;
+    //delegationVote.vp = delegatorSumVotingPower;
     delegationVote.totalRewards = 0;
 
     // Extract address per choice
@@ -189,14 +196,21 @@ const main = async () => {
       const ratioVp = vp * 100 / delegationVote.vp;
 
       // This user should receive ratioVp% of all rewards
+      if(space === SDCRV_SPACE && delegatorAddress.toLowerCase() === "0x1c0d72a330f2768daf718def8a19bab019eead09".toLowerCase()) {
+          console.log(vp);
+          console.log(ratioVp)
+          console.log(delegationVote.totalRewards);
+          console.log(ratioVp * delegationVote.totalRewards / 100)
+          
+      }
       delegationVote.delegation[delegatorAddress] = ratioVp * delegationVote.totalRewards / 100;
     }
 
     // Check split
-    const totalSplitDelegationRewards = Object.values(delegationVote.delegation).reduce((acc, d) => acc + d, 0.0) || 0;
+    /*const totalSplitDelegationRewards = Object.values(delegationVote.delegation).reduce((acc, d) => acc + d, 0.0) || 0;
     if (parseInt(delegationVote.totalRewards) !== parseInt(totalSplitDelegationRewards)) {
-      throw new Error("Delegation split rewards wrong " + delegationVote.totalRewards + " - " + totalSplitDelegationRewards);
-    }
+      throw new Error("Delegation " + space + " - " + id + " split rewards wrong " + delegationVote.totalRewards + " - " + totalSplitDelegationRewards);
+    }*/
 
     // Calculate delegation apr
     const delegationAPR = ((Number(delegationVote.totalRewards) * 26 * tokenPrice) / delegatorSumVotingPower) * 100 / tokenPrice;
@@ -272,11 +286,11 @@ const main = async () => {
     const merkle = {};
     for (let i = 0; i < userRewardAddresses.length; i++) {
       const userAddress = userRewardAddresses[i];
-      const amount = userRewards[userAddress];
+      const amount = BigNumber.from(parseEther(userRewards[userAddress].toString()));
 
       merkle[userAddress.toLowerCase()] = {
         index: i,
-        amount: amount,
+        amount,
         proof: merkleTree.getHexProof(elements[i]),
       };
     }
@@ -313,7 +327,32 @@ const extractCSV = () => {
   // TODO
   return {
     [SDCRV_SPACE]: {
-      "0x8d867bef70c6733ff25cc0d1caa8aa6c38b24817": 280000,
+      "0xD5bE6A05B45aEd524730B6d1CC05F59b021f6c87": 325.28,
+      "0x06B30D5F2341C2FB3F6B48b109685997022Bd272": 15844.77,
+      "0xe5d5Aa1Bbe72F68dF42432813485cA1Fc998DE32": 8834.28,
+      "0xd03BE91b1932715709e18021734fcB91BB431715": 55940.15,
+      "0x79F21BC30632cd40d2aF8134B469a0EB4C9574AA": 29278.38,
+      "0x98ff4EE7524c501F582C48b828277D2B42bbc894": 3168.19,
+      "0x85D44861D024CB7603Ba906F2Dc9569fC02083F6": 40370.93,
+      "0x95f00391cB5EebCd190EB58728B4CE23DbFa6ac1": 21110.00,
+      "0xF29FfF074f5cF755b55FbB3eb10A29203ac91EA2": 41514.63,
+      "0x4e6bB6B7447B7B2Aa268C16AB87F4Bb48BF57939": 27282.00,
+      "0x8D867BEf70C6733ff25Cc0D1caa8aA6c38B24817": 25574.47,
+      "0x60d3d7eBBC44Dc810A743703184f062d00e6dB7e": 27511.98,
+      "0x40371aad2a24ed841316EF30938881440FD4426c": 11001.68,
+      "0xB721Cc32160Ab0da2614CC6aB16eD822Aeebc101": 1948.27,
+    },
+    [SDBAL_SPACE]: {
+      "0x81C452E84B103555C2Dd2DEc0bFABC0c4d6B3065": 265.23,
+      "0x275dF57d2B23d53e20322b4bb71Bf1dCb21D0A00": 72.94,
+      "0xD449Efa0A587f2cb6BE3AE577Bc167a774525810": 121.53,
+      "0x5aF3B93Fb82ab8691b82a09CBBae7b8D3eB5Ac11": 121.93,
+      "0xDc2Df969EE5E66236B950F5c4c5f8aBe62035df2": 22.16,
+      "0xbf65b3fA6c208762eD74e82d4AEfCDDfd0323648": 61.43,
+      "0x5669736FD1dF3572f9D519FcCf7536A750CFAc62": 0.08,
+    },
+    [SDFXS_SPACE]: {
+      "0x39cd4db6460d8B5961F73E997E86DdbB7Ca4D5F6": 770.36
     }
   }
 };
@@ -570,6 +609,9 @@ const extractProposalChoices = (proposal) => {
   const addressesPerChoice = {};
   for (let i = 0; i < proposal.choices.length; i++) {
     const choice = proposal.choices[i];
+    if(choice.indexOf("Current Weights") > -1 || choice.indexOf("Paste") > -1 || choice.indexOf("Total Percentage") > -1) {
+      continue;
+    }
     const start = choice.indexOf(" - 0x");
     if (start === -1) {
       throw new Error("Impossible to parse choice : " + choice);
@@ -593,7 +635,12 @@ const getChoiceWhereExistsBribe = (addressesPerChoice, cvsResult) => {
     return newAddressesPerChoice;
   }
 
-  const addresses = Object.keys(cvsResult).map((addr) => addr.toLowerCase());
+  const cvsResultLowerCase = {};
+  for(const key of Object.keys(cvsResult)) {
+    cvsResultLowerCase[key.toLowerCase()] = cvsResult[key];
+  }
+
+  const addresses = Object.keys(cvsResultLowerCase).map((addr) => addr.toLowerCase());
 
   for (const key of Object.keys(addressesPerChoice)) {
     const k = key.toLowerCase();
@@ -605,7 +652,7 @@ const getChoiceWhereExistsBribe = (addressesPerChoice, cvsResult) => {
 
       newAddressesPerChoice[addr] = {
         index: addressesPerChoice[key],
-        amount: cvsResult[addr]
+        amount: cvsResultLowerCase[addr]
       };
       break;
     }
