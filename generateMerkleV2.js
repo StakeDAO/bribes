@@ -45,7 +45,7 @@ const SPACES_IMAGE = {
 
 const SPACES_UNDERLYING_TOKEN = {
   [SDCRV_SPACE]: "0xd533a949740bb3306d119cc777fa900ba034cd52",
-  [SDBAL_SPACE]: "0xba100000625a3754423978a60c9317c58a424e3d",
+  [SDBAL_SPACE]: "0x5c6ee304399dbdb9c8ef030ab642b10820db8f56", //80BAL instead of bal
   [SDFXS_SPACE]: "0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0",
   [SDANGLE_SPACE]: "0x31429d1856ad1377a8a0079410b297e1a9e214c2"
 };
@@ -215,7 +215,10 @@ const main = async () => {
     }*/
 
     // Calculate delegation apr
-    const delegationAPR = ((Number(delegationVote.totalRewards) * 26 * tokenPrice) / delegatorSumVotingPower) * 100 / tokenPrice;
+    let delegationAPR = ((Number(delegationVote.totalRewards) * 26 * tokenPrice) / delegationVote.vp) * 100 / tokenPrice;
+    if (space === SDFXS_SPACE) {
+      delegationAPR *= 4;
+    }
     delegationAPRs[space] = delegationAPR;
 
     // Create a map with userAddress => reward amount
