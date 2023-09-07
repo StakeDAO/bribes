@@ -55,7 +55,7 @@ const main = async () => {
   const csvResult = extractCSV();
 
   // Fetch last merkle
-  const { data: lastMerkles } = await axios.get("https://raw.githubusercontent.com/StakeDAO/bribes/main/merkle.json");
+  const { data: lastMerkles } = await axios.get("https://raw.githubusercontent.com/StakeDAO/bribes/db315667db3b9ee2be1997034b55ee2d50016a91/merkle.json"); //await axios.get("https://raw.githubusercontent.com/StakeDAO/bribes/main/merkle.json");
 
   // Fetch last proposal ids
   const proposalIdPerSpace = await fetchLastProposalsIds();
@@ -105,9 +105,9 @@ const main = async () => {
       }
     }
 
-    //const delegatorSumVotingPower = Object.values(delegatorsVotingPower).reduce((acc, vp) => acc + vp, 0.0);
+    const delegatorSumVotingPower = Object.values(delegatorsVotingPower).reduce((acc, vp) => acc + vp, 0.0);
     let delegationVote = voters.find((v) => v.voter.toLowerCase() === DELEGATION_ADDRESS.toLowerCase());
-    const delegatorSumVotingPower = delegationVote.vp;
+    //const delegatorSumVotingPower = delegationVote;
     if (!delegationVote) {
       throw new Error("No delegation vote for " + space + " - " + id);
     }
@@ -193,14 +193,16 @@ const main = async () => {
 
     for (const delegatorAddress of Object.keys(delegatorsVotingPower)) {
       const vp = delegatorsVotingPower[delegatorAddress];
-      const ratioVp = vp * 100 / delegationVote.vp;
+      const ratioVp = vp * 100 / delegatorSumVotingPower;
 
       // This user should receive ratioVp% of all rewards
       if(space === SDCRV_SPACE && delegatorAddress.toLowerCase() === "0x1c0d72a330f2768daf718def8a19bab019eead09".toLowerCase()) {
-          console.log(vp);
-          console.log(ratioVp)
-          console.log(delegationVote.totalRewards);
-          console.log(ratioVp * delegationVote.totalRewards / 100)
+          console.log("Concentrator vp : ", vp);
+          console.log("Delegation vp : ", delegatorSumVotingPower)
+          console.log("Total rewards : ", delegationVote.totalRewards);
+          console.log("Ratio % : ", ratioVp)
+          console.log("Ratio rewards : ", ratioVp * delegationVote.totalRewards / 100)
+          console.log("Ratio rewards new : ",vp * delegationVote.totalRewards / delegatorSumVotingPower)
           
       }
       delegationVote.delegation[delegatorAddress] = ratioVp * delegationVote.totalRewards / 100;
@@ -284,9 +286,11 @@ const main = async () => {
     const merkleTree = new MerkleTree(elements, keccak256, { sort: true });
 
     const merkle = {};
+    let totalAmount = BigNumber.from(0);
     for (let i = 0; i < userRewardAddresses.length; i++) {
       const userAddress = userRewardAddresses[i];
       const amount = BigNumber.from(parseEther(userRewards[userAddress].toString()));
+      totalAmount = totalAmount.add(amount);
 
       merkle[userAddress.toLowerCase()] = {
         index: i,
@@ -301,6 +305,7 @@ const main = async () => {
       "image": SPACES_IMAGE[space],
       "merkle": merkle,
       root: merkleTree.getHexRoot(),
+      "total": totalAmount
     });
   }
 
