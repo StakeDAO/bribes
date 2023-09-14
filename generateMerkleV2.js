@@ -6,6 +6,7 @@ const { gql, request } = require("graphql-request");
 const axios = require('axios').default;
 const { utils, BigNumber } = require("ethers");
 const { formatUnits, parseEther } = require("viem");
+const { parse } = require("csv-parse/sync");
 
 const MERKLE_ADDRESS = "0x03E34b085C52985F6a5D27243F20C84bDdc01Db4";
 
@@ -22,6 +23,14 @@ const SDFXS_SPACE = "sdfxs.eth";
 const SDANGLE_SPACE = "sdangle.eth";
 
 const SPACES = [SDCRV_SPACE, SDBAL_SPACE, SDFXS_SPACE, SDANGLE_SPACE];
+
+const LABELS_TO_SPACE = {
+  "frax": SDFXS_SPACE,
+  "curve": SDCRV_SPACE,
+  "balancer": SDBAL_SPACE,
+  "angle": SDANGLE_SPACE
+};
+
 const SPACES_TOKENS = {
   [SDCRV_SPACE]: "0xD1b5651E55D4CeeD36251c61c50C889B36F6abB5",
   [SDBAL_SPACE]: "0xF24d8651578a55b0C119B9910759a351A3458895",
@@ -332,37 +341,36 @@ const main = async () => {
 }
 
 const extractCSV = () => {
-  // TODO
-  return {
-    [SDCRV_SPACE]: {
-      "0xD5bE6A05B45aEd524730B6d1CC05F59b021f6c87": 325.28,
-      "0x06B30D5F2341C2FB3F6B48b109685997022Bd272": 15844.77,
-      "0xe5d5Aa1Bbe72F68dF42432813485cA1Fc998DE32": 8834.28,
-      "0xd03BE91b1932715709e18021734fcB91BB431715": 55940.15,
-      "0x79F21BC30632cd40d2aF8134B469a0EB4C9574AA": 29278.38,
-      "0x98ff4EE7524c501F582C48b828277D2B42bbc894": 3168.19,
-      "0x85D44861D024CB7603Ba906F2Dc9569fC02083F6": 40370.93,
-      "0x95f00391cB5EebCd190EB58728B4CE23DbFa6ac1": 21110.00,
-      "0xF29FfF074f5cF755b55FbB3eb10A29203ac91EA2": 41514.63,
-      "0x4e6bB6B7447B7B2Aa268C16AB87F4Bb48BF57939": 27282.00,
-      "0x8D867BEf70C6733ff25Cc0D1caa8aA6c38B24817": 25574.47,
-      "0x60d3d7eBBC44Dc810A743703184f062d00e6dB7e": 27511.98,
-      "0x40371aad2a24ed841316EF30938881440FD4426c": 11001.68,
-      "0xB721Cc32160Ab0da2614CC6aB16eD822Aeebc101": 1948.27,
-    },
-    [SDBAL_SPACE]: {
-      "0x81C452E84B103555C2Dd2DEc0bFABC0c4d6B3065": 265.23,
-      "0x275dF57d2B23d53e20322b4bb71Bf1dCb21D0A00": 72.94,
-      "0xD449Efa0A587f2cb6BE3AE577Bc167a774525810": 121.53,
-      "0x5aF3B93Fb82ab8691b82a09CBBae7b8D3eB5Ac11": 121.93,
-      "0xDc2Df969EE5E66236B950F5c4c5f8aBe62035df2": 22.16,
-      "0xbf65b3fA6c208762eD74e82d4AEfCDDfd0323648": 61.43,
-      "0x5669736FD1dF3572f9D519FcCf7536A750CFAc62": 0.08,
-    },
-    [SDFXS_SPACE]: {
-      "0x39cd4db6460d8B5961F73E997E86DdbB7Ca4D5F6": 770.36
+  const cvsFile = fs.readFileSync("./report.csv");
+  const records = parse(cvsFile, {
+    columns: true,
+    skip_empty_lines: true
+  });
+
+  const response = {};
+  for (const row of records) {
+    const space = LABELS_TO_SPACE[row["Protocol"]];
+    if (!space) {
+      throw new Error("can't find space for " + row["Protocol"]);
     }
+
+    if (!response[space]) {
+      response[space] = {};
+    }
+
+    const gaugeAddress = row["Gauge Address"];
+    if (!gaugeAddress) {
+      throw new Error("can't find gauge address for " + row["Protocol"]);
+    }
+
+    if (!response[space][gaugeAddress]) {
+      response[space][gaugeAddress] = 0;
+    }
+
+    response[space][gaugeAddress] += parseFloat(row["Reward Amount"])
   }
+
+  return response;
 };
 
 /**
