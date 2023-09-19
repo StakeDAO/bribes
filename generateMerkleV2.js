@@ -64,7 +64,7 @@ const main = async () => {
   const csvResult = extractCSV();
 
   // Fetch last merkle
-  const { data: lastMerkles } = await axios.get("https://raw.githubusercontent.com/StakeDAO/bribes/db315667db3b9ee2be1997034b55ee2d50016a91/merkle.json"); //await axios.get("https://raw.githubusercontent.com/StakeDAO/bribes/main/merkle.json");
+  const { data: lastMerkles } = await axios.get("https://raw.githubusercontent.com/StakeDAO/bribes/main/merkle.json");
 
   // Fetch last proposal ids
   const proposalIdPerSpace = await fetchLastProposalsIds();
@@ -344,7 +344,8 @@ const extractCSV = () => {
   const cvsFile = fs.readFileSync("./report.csv");
   const records = parse(cvsFile, {
     columns: true,
-    skip_empty_lines: true
+    skip_empty_lines: true,
+    delimiter: ";"
   });
 
   const response = {};
@@ -367,7 +368,7 @@ const extractCSV = () => {
       response[space][gaugeAddress] = 0;
     }
 
-    response[space][gaugeAddress] += parseFloat(row["Reward Amount"])
+    response[space][gaugeAddress] += parseFloat(row["Reward sd Value"])
   }
 
   return response;
