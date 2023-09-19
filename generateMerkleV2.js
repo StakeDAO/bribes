@@ -72,6 +72,9 @@ const main = async () => {
   const newMerkles = [];
   const delegationAPRs = {};
 
+  const toFreeze = [];
+  const toSet = [];
+
   for (const space of Object.keys(proposalIdPerSpace)) {
     checkSpace(space);
 
@@ -319,7 +322,16 @@ const main = async () => {
       root: merkleTree.getHexRoot(),
       "total": totalAmount
     });
+
+    toFreeze.push(tokenToDistribute);
+    toSet.push(merkleTree.getHexRoot());
   }
+
+  console.log("To freeze :");
+  console.log(toFreeze);
+  console.log("----------");
+  console.log("New roots :");
+  console.log(toSet);
 
   for (const lastMerkle of lastMerkles) {
 

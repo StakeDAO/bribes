@@ -1,5 +1,7 @@
 const { BigNumber } = require("ethers");
-const lastMerkle = require("./merkle.json");
+const lastMerkle = require("./merkleV2.json");
+
+
 
 console.log("-- FREEZE --");
 console.log(lastMerkle.filter((m) => m.symbol !== "WBTC").map((m) => m.address));
