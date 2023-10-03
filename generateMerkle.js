@@ -762,9 +762,9 @@ const extractBribesData = () => {
 const main = async () => {
 
   /*********** Inputs ********/
-  const crvIdProposal = "0x36bf171685a23731db383b0376d78111ad9be1fd8d77945bff60fa45c3e78af8";
-  const balIdProposal = "0x76e4600d449c03da40fc28d1c512a3827fa990b122c4251a833e562dab7abcd4";
-  const fraxIdProposal = "0xdaf3ed71aaa68f3d4ec13f4a04e3a2afcbb16d3a6cb9660bea27758443f65634";
+  const crvIdProposal = "0x309978f6be7272f58a770d67754dea1b3d00ad02dd170ae5dc77590bd87c78c7";
+  const balIdProposal = "0x9f17858a7f2d52fd4b32a997cac7400019362093cf9c56b52ec7e754d00e6bb7";
+  const fraxIdProposal = "0x0c8c7d236e47f7dda9ccc8a2cac934c52060ea12748ce6fa957fa1f07b76cd35";
   //const angleIdProposal = "0x5cc81e3b7a4039a498819389d63ccf4c3dd06cfd2da7ab7170a15e05ae858da9";
 
   const bribesData = extractBribesData();
