@@ -217,7 +217,7 @@ const main = async () => {
           console.log("Ratio rewards new : ",vp * delegationVote.totalRewards / delegatorSumVotingPower)
           
       }
-      delegationVote.delegation[delegatorAddress] = ratioVp * delegationVote.totalRewards / 100;
+      delegationVote.delegation[delegatorAddress.toLowerCase()] = ratioVp * delegationVote.totalRewards / 100;
     }
 
     // Check split
@@ -291,10 +291,11 @@ const main = async () => {
     // Since this point, userRewards map contains the new reward amount for each user
     // We have to generate the merkle
     const userRewardAddresses = Object.keys(userRewards);
+    
     const elements = [];
     for (let i = 0; i < userRewardAddresses.length; i++) {
       const userAddress = userRewardAddresses[i];
-      const amount = parseEther(userRewards[userAddress].toString());
+      const amount = parseEther(userRewards[userAddress.toLowerCase()].toString());
       elements.push(utils.solidityKeccak256(["uint256", "address", "uint256"], [i, userAddress.toLowerCase(), BigNumber.from(amount)]));
     }
 
@@ -304,7 +305,7 @@ const main = async () => {
     let totalAmount = BigNumber.from(0);
     for (let i = 0; i < userRewardAddresses.length; i++) {
       const userAddress = userRewardAddresses[i];
-      const amount = BigNumber.from(parseEther(userRewards[userAddress].toString()));
+      const amount = BigNumber.from(parseEther(userRewards[userAddress.toLowerCase()].toString()));
       totalAmount = totalAmount.add(amount);
 
       merkle[userAddress.toLowerCase()] = {
