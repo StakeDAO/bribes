@@ -7,8 +7,10 @@ const axios = require('axios').default;
 const { utils, BigNumber } = require("ethers");
 const { formatUnits, parseEther } = require("viem");
 const { parse } = require("csv-parse/sync");
+const { parseAbi, encodeFunctionData } = require("viem");
 
 const MERKLE_ADDRESS = "0x03E34b085C52985F6a5D27243F20C84bDdc01Db4";
+const STASH_CONTROLLER_ADDRESS = "0x2f18e001B44DCc1a1968553A2F32ab8d45B12195";
 
 const SNAPSHOT_ENDPOINT = "https://hub.snapshot.org/graphql";
 const ENDPOINT_DELEGATORS = "https://api.thegraph.com/subgraphs/name/snapshot-labs/snapshot";
@@ -58,6 +60,11 @@ const SPACES_UNDERLYING_TOKEN = {
   [SDFXS_SPACE]: "0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0",
   [SDANGLE_SPACE]: "0x31429d1856ad1377a8a0079410b297e1a9e214c2"
 };
+
+const abi = parseAbi([
+  'function multiFreeze(address[] tokens) public',
+  'function multiSet(address[] tokens, bytes32[] roots) public',
+]);
 
 const main = async () => {
 
@@ -328,11 +335,27 @@ const main = async () => {
     toSet.push(merkleTree.getHexRoot());
   }
 
+  const freezeData = encodeFunctionData({
+    abi,
+    functionName: 'multiFreeze',
+    args: [toFreeze],
+  });
+
+  const multiSetData = encodeFunctionData({
+    abi,
+    functionName: 'multiSet',
+    args: [toFreeze, toSet],
+  })
+  
   console.log("To freeze :");
-  console.log(toFreeze);
+  console.log("Contract : " + STASH_CONTROLLER_ADDRESS);
+  console.log("Data : ");
+  console.log(freezeData);
   console.log("----------");
   console.log("New roots :");
-  console.log(toSet);
+  console.log("Contract : " + STASH_CONTROLLER_ADDRESS);
+  console.log("Data : ");
+  console.log(multiSetData);
 
   for (const lastMerkle of lastMerkles) {
 
