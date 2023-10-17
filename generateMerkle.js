@@ -78,7 +78,7 @@ const main = async () => {
   for (const space of Object.keys(proposalIdPerSpace)) {
     checkSpace(space);
 
-    // If ne bribe to distribute to this space => skip
+    // If no bribe to distribute to this space => skip
     if(!csvResult[space]) {
       continue;
     }
@@ -355,33 +355,44 @@ const main = async () => {
 
 const extractCSV = () => {
   const cvsFile = fs.readFileSync("./report.csv");
-  const records = parse(cvsFile, {
+  let records = parse(cvsFile, {
     columns: true,
     skip_empty_lines: true,
-    delimiter: ";"
+    delimiter: ";",
   });
+
+  const newRecords = [];
+  for(const row of records) {
+    let obj = {};
+    for(const key of Object.keys(row)) {
+      obj[key.toLowerCase()] = row[key];
+    }
+    newRecords.push(obj);
+  }
+
+  records = newRecords;
 
   const response = {};
   for (const row of records) {
-    const space = LABELS_TO_SPACE[row["Protocol"]];
+    const space = LABELS_TO_SPACE[row["protocol"]];
     if (!space) {
-      throw new Error("can't find space for " + row["Protocol"]);
+      throw new Error("can't find space for " + row["protocol"]);
     }
 
     if (!response[space]) {
       response[space] = {};
     }
 
-    const gaugeAddress = row["Gauge Address"];
+    const gaugeAddress = row["Gauge Address".toLowerCase()];
     if (!gaugeAddress) {
-      throw new Error("can't find gauge address for " + row["Protocol"]);
+      throw new Error("can't find gauge address for " + row["protocol"]);
     }
 
     if (!response[space][gaugeAddress]) {
       response[space][gaugeAddress] = 0;
     }
 
-    response[space][gaugeAddress] += parseFloat(row["Reward sd Value"])
+    response[space][gaugeAddress] += parseFloat(row["Reward sd Value".toLowerCase()])
   }
 
   return response;
