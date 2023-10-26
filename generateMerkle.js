@@ -86,7 +86,7 @@ const main = async () => {
     checkSpace(space);
 
     // If no bribe to distribute to this space => skip
-    if(!csvResult[space]) {
+    if (!csvResult[space]) {
       continue;
     }
 
@@ -215,14 +215,14 @@ const main = async () => {
       const ratioVp = vp * 100 / delegatorSumVotingPower;
 
       // This user should receive ratioVp% of all rewards
-      if(space === SDCRV_SPACE && delegatorAddress.toLowerCase() === "0x1c0d72a330f2768daf718def8a19bab019eead09".toLowerCase()) {
-          console.log("Concentrator vp : ", vp);
-          console.log("Delegation vp : ", delegatorSumVotingPower)
-          console.log("Total rewards : ", delegationVote.totalRewards);
-          console.log("Ratio % : ", ratioVp)
-          console.log("Ratio rewards : ", ratioVp * delegationVote.totalRewards / 100)
-          console.log("Ratio rewards new : ",vp * delegationVote.totalRewards / delegatorSumVotingPower)
-          
+      if (space === SDCRV_SPACE && delegatorAddress.toLowerCase() === "0x1c0d72a330f2768daf718def8a19bab019eead09".toLowerCase()) {
+        console.log("Concentrator vp : ", vp);
+        console.log("Delegation vp : ", delegatorSumVotingPower)
+        console.log("Total rewards : ", delegationVote.totalRewards);
+        console.log("Ratio % : ", ratioVp)
+        console.log("Ratio rewards : ", ratioVp * delegationVote.totalRewards / 100)
+        console.log("Ratio rewards new : ", vp * delegationVote.totalRewards / delegatorSumVotingPower)
+
       }
       delegationVote.delegation[delegatorAddress.toLowerCase()] = ratioVp * delegationVote.totalRewards / 100;
     }
@@ -298,7 +298,7 @@ const main = async () => {
     // Since this point, userRewards map contains the new reward amount for each user
     // We have to generate the merkle
     const userRewardAddresses = Object.keys(userRewards);
-    
+
     const elements = [];
     for (let i = 0; i < userRewardAddresses.length; i++) {
       const userAddress = userRewardAddresses[i];
@@ -346,7 +346,7 @@ const main = async () => {
     functionName: 'multiSet',
     args: [toFreeze, toSet],
   })
-  
+
   console.log("To freeze :");
   console.log("Contract : " + STASH_CONTROLLER_ADDRESS);
   console.log("Data : ");
@@ -377,7 +377,25 @@ const main = async () => {
 }
 
 const extractCSV = () => {
-  const cvsFile = fs.readFileSync("./report.csv");
+  const reportDir = './reports/';
+  const files = fs.readdirSync(reportDir);
+
+  // Filter out the CSV files
+  const csvFiles = files.filter(file => file.endsWith('.csv'));
+
+  // Sort the CSV files based on the date in the filename
+  const sortedCsvFiles = csvFiles.sort((a, b) => {
+    const dateA = a.split('_')[1];
+    const dateB = b.split('_')[1];
+    return new Date(dateB) - new Date(dateA);
+  });
+
+  console.log("Using : " + sortedCsvFiles[0]);
+
+  // Get the most recent CSV file
+  const mostRecentCsvFile = sortedCsvFiles[0];
+
+  const cvsFile = fs.readFileSync(reportDir + mostRecentCsvFile);
   let records = parse(cvsFile, {
     columns: true,
     skip_empty_lines: true,
@@ -385,9 +403,9 @@ const extractCSV = () => {
   });
 
   const newRecords = [];
-  for(const row of records) {
+  for (const row of records) {
     let obj = {};
-    for(const key of Object.keys(row)) {
+    for (const key of Object.keys(row)) {
       obj[key.toLowerCase()] = row[key];
     }
     newRecords.push(obj);
@@ -673,7 +691,7 @@ const extractProposalChoices = (proposal) => {
   const addressesPerChoice = {};
   for (let i = 0; i < proposal.choices.length; i++) {
     const choice = proposal.choices[i];
-    if(choice.indexOf("Current Weights") > -1 || choice.indexOf("Paste") > -1 || choice.indexOf("Total Percentage") > -1) {
+    if (choice.indexOf("Current Weights") > -1 || choice.indexOf("Paste") > -1 || choice.indexOf("Total Percentage") > -1) {
       continue;
     }
     const start = choice.indexOf(" - 0x");
@@ -700,7 +718,7 @@ const getChoiceWhereExistsBribe = (addressesPerChoice, cvsResult) => {
   }
 
   const cvsResultLowerCase = {};
-  for(const key of Object.keys(cvsResult)) {
+  for (const key of Object.keys(cvsResult)) {
     cvsResultLowerCase[key.toLowerCase()] = cvsResult[key];
   }
 
