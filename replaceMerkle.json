@@ -28,15 +28,15 @@
                 "index": 0,
                 "amount": {
                     "type": "BigNumber",
-                    "hex": "0x61c9618cdea9763e"
+                    "hex": "0x612cef0aa555363e"
                 },
                 "proof": []
             }
         },
-        "root": "0x316c7ca9b8502eb7e0584378a34b551b0a499cbf12af4289307cbc414c19da33",
+        "root": "0x7aab6b6f79289210bcf6a3bf19be42fb82b28483ce44f25168bd695f24d8f978",
         "total": {
             "type": "BigNumber",
-            "hex": "0x61c9618cdea9763e"
+            "hex": "0x612cef0aa555363e"
         }
     },
     {
@@ -48,15 +48,15 @@
                 "index": 0,
                 "amount": {
                     "type": "BigNumber",
-                    "hex": "0x063cc09cd89bbc0b8d00"
+                    "hex": "0x061bc6cf00edc5918d00"
                 },
                 "proof": []
             }
         },
-        "root": "0xcd63f521aaf0fb75f577126cf4e40bd03699574c7d92bae450f7075e16615892",
+        "root": "0xa3934e27076d13cc3b41b19071ed13eae9bede4fe3f8e55d774677491374e442",
         "total": {
             "type": "BigNumber",
-            "hex": "0x063cc09cd89bbc0b8d00"
+            "hex": "0x061bc6cf00edc5918d00"
         }
     },
     {

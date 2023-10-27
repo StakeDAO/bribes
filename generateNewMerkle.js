@@ -12,6 +12,8 @@ const MS = "0xf930ebbd05ef8b25b1797b9b2109ddc9b0d43063";
 const abi = parseAbi([
     'function isClaimed(address token, uint256 index) view returns(bool)',
     'function balanceOf(address user) view returns(uint256)',
+    'function vaultMap(uint256 index, address user) view returns(address)',
+    'function earned(address user) view returns(uint256[])',
 ]);
 
 const TOKENS = [
@@ -29,6 +31,7 @@ const publicClient = createPublicClient({
 });
 
 const replaceMerkle = async () => {
+
     const newMerkles = [];
 
     const balanceOfCalls = [];
@@ -68,12 +71,19 @@ const replaceMerkle = async () => {
             proof: merkleTree.getHexProof(elements[index]),
         };
 
+        const root = merkleTree.getHexRoot();
+
+        console.log(merkle.symbol);
+        console.log(merkle.address)
+        console.log(root)
+        console.log("-----")
+
         newMerkles.push({
             "symbol": merkle.symbol,
             "address": merkle.address,
             "image": merkle.image,
             "merkle": merkleData,
-            root: merkleTree.getHexRoot(),
+            root,
             "total": balance
         });
     }
@@ -163,12 +173,19 @@ const newMerkle = async () => {
             };
         }
 
+        const root = merkleTree.getHexRoot();
+
+        console.log(merkle.symbol);
+        console.log(merkle.address)
+        console.log(root)
+        console.log("-----")
+
         newMerkles.push({
             "symbol": merkle.symbol,
             "address": merkle.address,
             "image": merkle.image,
             "merkle": merkleData,
-            root: merkleTree.getHexRoot(),
+            root,
             "total": totalAmount
         });
     }
@@ -176,5 +193,5 @@ const newMerkle = async () => {
     fs.writeFileSync(`./newMerkle.json`, JSON.stringify(newMerkles));
 };
 
+//replaceMerkle();
 newMerkle();
-
