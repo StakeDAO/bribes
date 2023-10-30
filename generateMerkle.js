@@ -68,8 +68,8 @@ const abi = parseAbi([
 
 const main = async () => {
 
-  const csvResult = extractCSV();
-
+  const csvResult = await extractCSV();
+  
   // Fetch last merkle
   const { data: lastMerkles } = await axios.get("https://raw.githubusercontent.com/StakeDAO/bribes/main/merkle.json");
 
@@ -376,27 +376,31 @@ const main = async () => {
   fs.writeFileSync(`./delegationsAPRs.json`, JSON.stringify(delegationAPRs));
 }
 
-const extractCSV = () => {
-  const reportDir = './reports/';
-  const files = fs.readdirSync(reportDir);
+const extractCSV = async () => {
+  const reportDir = 'https://raw.githubusercontent.com/stake-dao/bounties-report/main/';
+
+  // Get the list of files in the repository
+  const { data: files } = await axios.get('https://api.github.com/repos/stake-dao/bounties-report/contents');
 
   // Filter out the CSV files
-  const csvFiles = files.filter(file => file.endsWith('.csv'));
+  const csvFiles = files.filter(file => file.name.endsWith('.csv'));
 
   // Sort the CSV files based on the date in the filename
   const sortedCsvFiles = csvFiles.sort((a, b) => {
-    const dateA = a.split('_')[1];
-    const dateB = b.split('_')[1];
+    const dateA = a.name.split('_')[1].split('-').reverse().join('-');
+    const dateB = b.name.split('_')[1].split('-').reverse().join('-');
     return new Date(dateB) - new Date(dateA);
   });
 
-  console.log("Using : " + sortedCsvFiles[0]);
+  console.log("Using : " + sortedCsvFiles[0].name);
 
   // Get the most recent CSV file
-  const mostRecentCsvFile = sortedCsvFiles[0];
+  const mostRecentCsvFile = sortedCsvFiles[0].name;
 
-  const cvsFile = fs.readFileSync(reportDir + mostRecentCsvFile);
-  let records = parse(cvsFile, {
+  // Fetch the CSV file from the GitHub repository
+  const { data: csvFile } = await axios.get(reportDir + mostRecentCsvFile);
+
+  let records = parse(csvFile, {
     columns: true,
     skip_empty_lines: true,
     delimiter: ";",
